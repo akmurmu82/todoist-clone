@@ -3,6 +3,7 @@ const express = require("express");
 const connection = require("./config/db");
 const cors = require("cors");
 const userRouter = require("./routes/userRoute");
+const todoRouter = require("./routes/todoRoute");
 require("dotenv").config();
 
 // Environmental variable
@@ -19,6 +20,7 @@ app.use(cors());
 
 // Routes
 app.use("/users", userRouter);
+app.use("/todo", todoRouter);
 
 // main route
 app.get("/", (req, res) => {
