@@ -34,8 +34,8 @@ This server manages users and their todos, implementing authentication using JWT
 
 | Method | Endpoint          | Description              |
 |--------|-------------------|--------------------------|
-| POST   | `/users/register`  | Register a new user      |
-| POST   | `/users/login`     | Log in an existing user  |
+| POST   | `/users/register` | Register a new user      |
+| POST   | `/users/login`    | Log in an existing user  |
 
 #### Todos Routes (Protected)
 
@@ -63,7 +63,7 @@ This server manages users and their todos, implementing authentication using JWT
   {
     "status": true,
     "message": "User registered successfully",
-    "newUser": { "name": "John Doe", "email": "john@example.com", "password": "hashed_password" }
+    "newUser": { "name": "John Doe", "email": "john@example.com" }
   }
   ```
 
@@ -100,7 +100,7 @@ This server manages users and their todos, implementing authentication using JWT
   {
     "status": true,
     "data": [
-      { "title": "Task 1", "isCompleted": false, "description": "Description 1" }
+      { "title": "Task 1", "isCompleted": false, "description": "Description 1", "priority": "Medium", "createdOn": "2024-09-18" }
     ]
   }
   ```
@@ -157,7 +157,8 @@ Authorization: Bearer <token>
 
 ### Error Handling
 - **401 Unauthorized**: Returned when the user is not authenticated or the token is invalid.
-- **403 Forbidden**: Returned when a user tries to update a todo they do not own.
+- **403 Forbidden**: Returned when a user tries to update or access a todo they do not own.
+- **404 Not Found**: Returned when a todo with the specified ID is not found.
 - **500 Internal Server Error**: Returned for server-side issues.
 
 ### Environment Variables
