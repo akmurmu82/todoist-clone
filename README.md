@@ -1,7 +1,3 @@
-Here's a brief documentation for the server:
-
----
-
 ## Todo API Server Documentation
 
 ### Overview
@@ -169,5 +165,3 @@ Authorization: Bearer <token>
 - **MONGO_URI**: MongoDB connection string.
 
 ---
-
-Let me know if you'd like more details or adjustments!
