@@ -20,7 +20,7 @@ app.use(cors());
 
 // Routes
 app.use("/users", userRouter);
-app.use("/todo", todoRouter);
+app.use("/todos", todoRouter);
 
 // main route
 app.get("/", (req, res) => {

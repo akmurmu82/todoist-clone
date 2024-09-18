@@ -5,9 +5,8 @@ const jwtSecret = process.env.JWT_SECRET;
 
 const addTodos = async (req, res) => {
   try {
-    const { title, description, isCompleted, createdOn, userId, priority } =
-      req.body;
-    console.log(title, description, isCompleted, createdOn, userId || priority);
+    const { title, description, createdOn, userId, priority } = req.body;
+    // console.log(title, description, createdOn, userId || priority);
 
     if (!title || !description || !userId || !priority) {
       return res
@@ -24,7 +23,6 @@ const addTodos = async (req, res) => {
 
     const newTodo = new TodoModel({
       title,
-      isCompleted,
       description,
       createdOn,
       userId,
@@ -39,7 +37,9 @@ const addTodos = async (req, res) => {
       data: newTodo,
     });
   } catch (error) {
-    res.status(500).json({ status: false, message: "Internal server error" });
+    res
+      .status(500)
+      .json({ status: false, error, message: "Internal server error" });
   }
 };
 

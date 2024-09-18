@@ -21,7 +21,7 @@ const auth = async (req, res, next) => {
     const decoded = jwt.verify(token, jwtSecret);
     // Attach decoded information to the request body
     req.body.userId = decoded.userId;
-    req.body.userName = decoded.userName;
+    req.body.name = decoded.name;
 
     next();
   } catch (error) {
