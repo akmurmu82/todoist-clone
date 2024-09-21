@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const UserModel = require("../../models/userModel");
 
 const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, accountType } = req.body;
 
   try {
     const existingUser = await UserModel.findOne({ email });
@@ -18,6 +18,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      accountType,
     });
 
     await newUser.save();

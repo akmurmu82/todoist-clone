@@ -20,6 +20,7 @@ import {
   FaArrowDown,
 } from "react-icons/fa"; // Import necessary icons
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 
 // Reusable MenuItem component
 const MenuItem = ({ title, href, hasDropdown }) => (
@@ -42,11 +43,8 @@ MenuItem.propTypes = {
   hasDropdown: PropTypes.bool,
 };
 
-MenuItem.defaultProps = {
-  hasDropdown: false,
-};
-
 function Navbar() {
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const menuItems = [
@@ -150,7 +148,7 @@ function Navbar() {
         {/* Buttons */}
         <HStack spacing={6} ml={2}>
           <Link
-            href="#"
+            href="/auth/login"
             fontSize="md"
             fontWeight="medium"
             color="gray.600"
@@ -160,7 +158,12 @@ function Navbar() {
           >
             Log in
           </Link>
-          <Button colorScheme="red" size="md" px={6}>
+          <Button
+            colorScheme="red"
+            size="md"
+            px={6}
+            onClick={() => navigate("/auth/signup")}
+          >
             Start for free
           </Button>
         </HStack>

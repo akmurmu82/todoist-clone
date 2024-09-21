@@ -1,0 +1,8 @@
+1. Two ways to update:
+
+ const updatedUser = await UserModel.findByIdAndUpdate(
+      { _id: userId },
+      {$set:updateData }, // this works!
+      // { ...updateData }, // this also works!
+      { new: true }
+    );

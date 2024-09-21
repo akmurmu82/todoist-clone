@@ -8,8 +8,10 @@ import {
   Image,
   VStack,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
 function LandingSection() {
+  const navigate = useNavigate()
   return (
     <Box px={20} py={16} bg="white">
       <Flex
@@ -52,7 +54,7 @@ function LandingSection() {
           </HStack>
 
           {/* Call to Action Button */}
-          <Button colorScheme="red" size="lg" px={6}>
+          <Button colorScheme="red" size="lg" px={6} onClick={()=>navigate('/auth/signup')}>
             Start for free
           </Button>
         </VStack>
