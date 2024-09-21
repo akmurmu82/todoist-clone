@@ -4,12 +4,10 @@ require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
 
 const updateUser = async (req, res) => {
-  console.log("update route");
 
   try {
     const { userId } = req.params;
     const { name, email, password, profilePic, accountType } = req.body;
-    console.log({ name, email, password, profilePic, accountType });
     const updateData = {};
 
     if (name) updateData.name = name;
@@ -17,8 +15,6 @@ const updateUser = async (req, res) => {
     if (password) updateData.password = password;
     if (profilePic) updateData.profilePic = profilePic;
     if (accountType) updateData.accountType = accountType;
-
-    console.log(updateData);
 
     const updatedUser = await UserModel.findByIdAndUpdate(
       { _id: userId },
