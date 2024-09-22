@@ -20,6 +20,7 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
@@ -27,6 +28,7 @@ function LoginPage() {
   const [isPasswordHidden, setIspasswordHidden] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate()
 
   let token = localStorage.getItem("todoistAuthToken") || "";
   if (token) {
@@ -45,16 +47,14 @@ function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      // if(email)
       let res = await axios.post(`${BaseBackendURL}/users/login`, {
         email,
         password,
       });
       if (token) {
-        window.location.href = "http://localhost:5173/home";
         token = res.data.token;
         localStorage.setItem("todoistAuthToken", JSON.stringify(token));
-        console.log(token);
+        navigate(`/home`)
       }
     } catch (error) {
       console.log(error);
