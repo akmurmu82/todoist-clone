@@ -4,7 +4,9 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Image,
   Input,
+  Spinner,
   Stack,
   Text,
   // useToast,
@@ -13,10 +15,13 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import todoisLogo from "../../assets/icons8-todoist-logo-120.png";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 function CreateProfile() {
   const user = JSON.parse(localStorage.getItem("currUser"));
+
+  const [isLoading, setIsLoading] = useState(false);
   console.log("user:", user);
   // const toast = useToast();
   const [profilePic, setProfilePic] = useState("");
@@ -31,7 +36,7 @@ function CreateProfile() {
   }
 
   const handleUpdateProfile = async () => {
-    console.log("updating...");
+    setIsLoading(true);
     try {
       let res = await axios.patch(
         `${BaseBackendURL}/users/update/${user._id}`,
@@ -42,12 +47,29 @@ function CreateProfile() {
       );
       if (res.data.status) {
         console.log(res.data);
+        setIsLoading(false);
         navigate("/onboard/use-case");
       }
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
   };
+
+  if (isLoading)
+    return (
+      <Flex
+        h={"100vh"}
+        w={"100vw"}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
+        <Box>
+          <Image alt="asdf" src={todoisLogo}></Image>
+          <Spinner color="red" />
+        </Box>
+      </Flex>
+    );
 
   return (
     <Box

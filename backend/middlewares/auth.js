@@ -5,6 +5,7 @@ const jwtSecret = process.env.JWT_SECRET;
 if (!jwtSecret) throw new Error("Missing JWT_SECRET in environment variables");
 
 const auth = async (req, res, next) => {
+  console.log(req.headers)
   try {
     const authHeaders = req.headers["authorization"];
     if (!authHeaders || !authHeaders.startsWith("Bearer ")) {

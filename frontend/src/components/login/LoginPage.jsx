@@ -51,9 +51,9 @@ function LoginPage() {
         password,
       });
       if (token) {
-        window.location.href = "http://localhost:5173/";
+        window.location.href = "http://localhost:5173/home";
         token = res.data.token;
-        localStorage.setItem("todoistAuthToken", token);
+        localStorage.setItem("todoistAuthToken", JSON.stringify(token));
         console.log(token);
       }
     } catch (error) {

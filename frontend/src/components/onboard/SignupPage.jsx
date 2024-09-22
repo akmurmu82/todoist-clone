@@ -64,9 +64,9 @@ function SignupPage() {
         localStorage.setItem("currUser", JSON.stringify(res.data.newUser));
         console.log(res);
 
-        // setTimeout(() => {
-        //   window.location.href = "http://localhost:5173/onboard/create-profile";
-        // }, 3000);
+        setTimeout(() => {
+          window.location.href = "http://localhost:5173/onboard/create-profile";
+        }, 3000);
       }
     } catch (error) {
       console.log(error);

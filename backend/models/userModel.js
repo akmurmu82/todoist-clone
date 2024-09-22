@@ -6,6 +6,7 @@ const userSchema = mongoose.Schema({
   password: { type: String },
   profilePic: { type: String },
   accountType: { type: Array },
+  todos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Todo' }]
 });
 
 const UserModel = mongoose.model("user", userSchema);

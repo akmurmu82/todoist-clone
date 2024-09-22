@@ -11,6 +11,7 @@ import {
   Checkbox,
   Spinner,
 } from "@chakra-ui/react";
+import todoisLogo from "../../assets/icons8-todoist-logo-120.png";
 import axios from "axios";
 import { useState } from "react";
 import { FaUser, FaBriefcase, FaGraduationCap } from "react-icons/fa";
@@ -59,7 +60,10 @@ const UseCase = () => {
         justifyContent={"center"}
         alignItems={"center"}
       >
-        <Spinner color="red.500" />
+        <Box>
+          <Image alt="asdf" src={todoisLogo}></Image>
+          <Spinner color="red" />
+        </Box>
       </Flex>
     );
   return (

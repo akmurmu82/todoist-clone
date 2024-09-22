@@ -6,3 +6,7 @@
       // { ...updateData }, // this also works!
       { new: true }
     );
+
+2. handle adding multiple instances of same todo
+  // $push: { todos: todoId }, // Add todoId to the todos array
+  $addToSet: { todos: todoId } // Avoid duplicates with $addToSet
