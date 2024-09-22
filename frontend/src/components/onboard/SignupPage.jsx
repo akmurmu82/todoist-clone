@@ -19,9 +19,11 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 function SignupPage() {
+  const navigate = useNavigate()
   const toast = useToast();
   const [isPasswordHidden, setIspasswordHidden] = useState(true);
   const [email, setEmail] = useState("");
@@ -65,7 +67,8 @@ function SignupPage() {
         console.log(res);
 
         setTimeout(() => {
-          window.location.href = "http://localhost:5173/onboard/create-profile";
+          navigate(`/onboard/create-profile`)
+          // window.location.href = "http://localhost:5173/onboard/create-profile";
         }, 3000);
       }
     } catch (error) {
