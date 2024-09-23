@@ -16,8 +16,7 @@ import {
   FormErrorMessage,
   Spacer,
 } from "@chakra-ui/react";
-import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -26,38 +25,51 @@ const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 function LoginPage() {
   const [isPasswordHidden, setIspasswordHidden] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate()
-
-  let token = localStorage.getItem("todoistAuthToken") || "";
-  if (token) {
-    console.log("user has token");
-  } else {
-    console.log("user has no token");
-  }
-
-  useEffect(() => {
-    console.log({ email, password });
-  }, [email, password]);
+  const [isEmailInvalid, setIsEmailInvalid] = useState(false);
+  const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
+  const navigate = useNavigate();
 
   const handleTogglePassword = () => {
     setIspasswordHidden(!isPasswordHidden);
   };
 
   const handleLogin = async () => {
+    if (!email) {
+      setIsEmailInvalid(true);
+    } else {
+      setIsEmailInvalid(false);
+    }
+
+    if (!password) {
+      setIsPasswordInvalid(true);
+    } else {
+      setIsPasswordInvalid(false);
+    }
+
+    if (!email || !password) {
+      setErrorMessage("Both email and password are required.");
+      return;
+    }
+
     try {
-      let res = await axios.post(`${BaseBackendURL}/users/login`, {
+      const res = await axios.post(`${BaseBackendURL}/users/login`, {
         email,
         password,
       });
-      if (token) {
-        token = res.data.token;
-        localStorage.setItem("todoistAuthToken", JSON.stringify(token));
-        navigate(`/home`)
-      }
+      const token = res.data.token;
+      localStorage.setItem("todoistAuthToken", JSON.stringify(token));
+      navigate(`/home`);
     } catch (error) {
-      console.log(error);
+      if (error.response) {
+        // Display the message returned by the server, or a generic error message
+        setErrorMessage(error.response.data.message || "An error occurred");
+      } else {
+        // Network error or no response received
+        setErrorMessage("Network error. Please try again.");
+      }
     }
   };
 
@@ -123,12 +135,7 @@ function LoginPage() {
             </Button>
 
             {/* Email Input */}
-            <FormControl
-              isInvalid={!email}
-              p={2}
-              borderRadius={"md"}
-              border={"1px solid #f1f1f1"}
-            >
+            <FormControl isInvalid={isEmailInvalid}>
               <FormLabel htmlFor="email" mb={1} fontSize="sm">
                 Email
               </FormLabel>
@@ -136,23 +143,20 @@ function LoginPage() {
                 id="email"
                 type="email"
                 name="email"
-                onChange={(e) => setEmail(e.target.value)}
-                border={"none"}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setErrorMessage(null); // Reset error message when input changes
+                }}
                 placeholder="Enter your email"
                 _focus={{ borderColor: "gray.400", boxShadow: "outline" }}
               />
-              {email == "" ? (
+              {isEmailInvalid && (
                 <FormErrorMessage>Email is required.</FormErrorMessage>
-              ) : null}
+              )}
             </FormControl>
 
             {/* Password Input */}
-            <FormControl
-              isInvalid={!password}
-              p={2}
-              borderRadius={"md"}
-              border={"1px solid #f1f1f1"}
-            >
+            <FormControl isInvalid={isPasswordInvalid}>
               <FormLabel htmlFor="password" mb={1} fontSize="sm">
                 Password
               </FormLabel>
@@ -160,9 +164,11 @@ function LoginPage() {
                 <Input
                   id="password"
                   type={isPasswordHidden ? "password" : "text"}
-                  border={"none"}
                   name="password"
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrorMessage(null); // Reset error message when input changes
+                  }}
                   placeholder="Enter your password"
                   _focus={{ borderColor: "gray.400", boxShadow: "outline" }}
                 />
@@ -177,10 +183,17 @@ function LoginPage() {
                   />
                 </InputRightElement>
               </InputGroup>
-              {password == "" ? (
-                <FormErrorMessage>password is required.</FormErrorMessage>
-              ) : null}
+              {isPasswordInvalid && (
+                <FormErrorMessage>Password is required.</FormErrorMessage>
+              )}
             </FormControl>
+
+            {/* Error Message */}
+            {errorMessage && (
+              <Text color="red.500" fontSize="sm">
+                {errorMessage}
+              </Text>
+            )}
 
             {/* Log In Button */}
             <Button
@@ -189,7 +202,6 @@ function LoginPage() {
               fontSize={"lg"}
               w="full"
               _hover={{ bg: "#db4c3e" }}
-              aria-label="Log in"
               onClick={handleLogin}
             >
               Log in
@@ -201,7 +213,6 @@ function LoginPage() {
               fontSize="sm"
               color="blue.500"
               _hover={{ color: "blue.700" }}
-              aria-label="Forgot your password?"
             >
               Forgot your password?
             </ChakraLink>
@@ -215,7 +226,6 @@ function LoginPage() {
                 textDecoration="underline"
                 color="blue.500"
                 _hover={{ color: "blue.700" }}
-                aria-label="Terms of Service"
               >
                 Terms of Service
               </ChakraLink>{" "}
@@ -225,7 +235,6 @@ function LoginPage() {
                 textDecoration="underline"
                 color="blue.500"
                 _hover={{ color: "blue.700" }}
-                aria-label="Privacy Policy"
               >
                 Privacy Policy
               </ChakraLink>
@@ -263,10 +272,4 @@ function LoginPage() {
   );
 }
 
-LoginPage.propTypes = {
-  props: PropTypes.any,
-};
-
 export default LoginPage;
-
-// Warning messages on reload

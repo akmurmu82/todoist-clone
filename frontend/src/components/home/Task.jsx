@@ -34,16 +34,10 @@ import {
   FaLink,
   FaTrash,
 } from "react-icons/fa";
-import PropTypes from "prop-types";
 import { RiSofaLine } from "react-icons/ri";
 import { RxValueNone } from "react-icons/rx";
 
-export default function TaskItem({
-  title,
-  description,
-  isCompleted,
-  priority,
-}) {
+export default function Component({ title = "Sample Task", description = "This is a sample task description", isCompleted = false, priority = "medium" }) {
   const [isHovering, setIsHovering] = useState(false);
 
   return (
@@ -87,7 +81,24 @@ export default function TaskItem({
               size="sm"
               variant="ghost"
             />
-            <Popover placement="bottom-end">
+            <Popover
+              placement="bottom-end"
+              strategy="fixed"
+              modifiers={[
+                {
+                  name: 'flip',
+                  options: {
+                    fallbackPlacements: ['top-end', 'bottom-start', 'top-start'],
+                  },
+                },
+                {
+                  name: 'preventOverflow',
+                  options: {
+                    padding: 8,
+                  },
+                },
+              ]}
+            >
               <PopoverTrigger>
                 <Button size="sm" variant="ghost">
                   <Icon as={FaEllipsisH} />
@@ -95,106 +106,122 @@ export default function TaskItem({
               </PopoverTrigger>
               <PopoverContent width="250px">
                 <PopoverBody p={0}>
-                  <VStack align="stretch" spacing={0} divider={<Divider />}>
-                    <Option icon={FaPencilAlt} text="Edit" shortcut="Ctrl E" />
-                    <Option
-                      icon={FaProjectDiagram}
-                      text="Go to project"
-                      shortcut="G"
-                    />
+                  <Box
+                    maxHeight="400px"
+                    overflowY="auto"
+                    css={{
+                      '&::-webkit-scrollbar': {
+                        width: '4px',
+                      },
+                      '&::-webkit-scrollbar-track': {
+                        width: '6px',
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        background: 'gray.300',
+                        borderRadius: '24px',
+                      },
+                    }}
+                  >
+                    <VStack align="stretch" spacing={0} divider={<Divider />}>
+                      <Option icon={FaPencilAlt} text="Edit" shortcut="Ctrl E" />
+                      <Option
+                        icon={FaProjectDiagram}
+                        text="Go to project"
+                        shortcut="G"
+                      />
 
-                    <VStack align="stretch" p={2} spacing={1}>
-                      <Text fontSize="xs" fontWeight="bold" color="gray.500">
-                        Due date
-                      </Text>
-                      <HStack>
-                        <Tooltip label="Tomorrow" placement="top">
-                          <IconButton
+                      <VStack align="stretch" p={2} spacing={1}>
+                        <Text fontSize="xs" fontWeight="bold" color="gray.500">
+                          Due date
+                        </Text>
+                        <HStack>
+                          <Tooltip label="Tomorrow" placement="top">
+                            <IconButton
+                              size="sm"
+                              variant="ghost"
+                              icon={<Icon as={FaSun} />}
+                              flex={1}
+                            />
+                          </Tooltip>
+                          <Tooltip label="Weekend" placement="top">
+                            <IconButton
+                              size="sm"
+                              variant="ghost"
+                              icon={<Icon as={RiSofaLine} />}
+                              flex={1}
+                            />
+                          </Tooltip>
+                          <Tooltip label="Next week" placement="top">
+                            <IconButton
+                              size="sm"
+                              variant="ghost"
+                              icon={<Icon as={FaRedo} />}
+                              flex={1}
+                            />
+                          </Tooltip>
+                          <Tooltip label="No date" placement="top">
+                            <IconButton
+                              size="sm"
+                              variant="ghost"
+                              icon={<Icon as={RxValueNone} />}
+                            />
+                          </Tooltip>
+                        </HStack>
+                      </VStack>
+
+                      <VStack align="stretch" p={2} spacing={1}>
+                        <Text fontSize="xs" fontWeight="bold" color="gray.500">
+                          Priority
+                        </Text>
+                        <HStack>
+                          <Button
                             size="sm"
                             variant="ghost"
-                            icon={<Icon as={FaSun} />}
-                            flex={1}
+                            leftIcon={<Icon as={FaFlag} color="red.500" />}
                           />
-                        </Tooltip>
-                        <Tooltip label="Weekend" placement="top">
-                          <IconButton
+                          <Button
                             size="sm"
                             variant="ghost"
-                            icon={<Icon as={RiSofaLine} />}
-                            flex={1}
+                            leftIcon={<Icon as={FaFlag} color="orange.500" />}
                           />
-                        </Tooltip>
-                        <Tooltip label="Next week" placement="top">
-                          <IconButton
+                          <Button
                             size="sm"
                             variant="ghost"
-                            icon={<Icon as={FaRedo} />}
-                            flex={1}
+                            leftIcon={<Icon as={FaFlag} color="blue.500" />}
                           />
-                        </Tooltip>
-                        <Tooltip label="No date" placement="top">
-                          <IconButton
+                          <Button
                             size="sm"
                             variant="ghost"
-                            icon={<Icon as={RxValueNone} />}
+                            leftIcon={<Icon as={FaFlag} color="gray.500" />}
                           />
-                        </Tooltip>
-                      </HStack>
+                        </HStack>
+                      </VStack>
+
+                      <Option icon={FaBell} text="Reminders" />
+                      <Option
+                        icon={FaCheckCircle}
+                        text="Complete recurring task"
+                        rightIcon={FaArrowRight}
+                      />
+                      <Option
+                        icon={FaArrowRight}
+                        text="Move to..."
+                        shortcut="M"
+                      />
+                      <Option icon={FaCopy} text="Duplicate" />
+                      <Option
+                        icon={FaLink}
+                        text="Copy link to task"
+                        shortcut="Ctrl C"
+                      />
+                      <Option
+                        icon={FaTrash}
+                        text="Delete"
+                        isDelete={true}
+                        shortcut="Ctrl D"
+                      />
                     </VStack>
-
-                    <VStack align="stretch" p={2} spacing={1}>
-                      <Text fontSize="xs" fontWeight="bold" color="gray.500">
-                        Priority
-                      </Text>
-                      <HStack>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          leftIcon={<Icon as={FaFlag} color="red.500" />}
-                        />
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          leftIcon={<Icon as={FaFlag} color="orange.500" />}
-                        />
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          leftIcon={<Icon as={FaFlag} color="blue.500" />}
-                        />
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          leftIcon={<Icon as={FaFlag} color="gray.500" />}
-                        />
-                      </HStack>
-                    </VStack>
-
-                    <Option icon={FaBell} text="Reminders" />
-                    <Option
-                      icon={FaCheckCircle}
-                      text="Complete recurring task"
-                      rightIcon={FaArrowRight}
-                    />
-                    <Option
-                      icon={FaArrowRight}
-                      text="Move to..."
-                      shortcut="M"
-                    />
-                    <Option icon={FaCopy} text="Duplicate" />
-                    <Option
-                      icon={FaLink}
-                      text="Copy link to task"
-                      shortcut="Ctrl C"
-                    />
-                    <Option
-                      icon={FaTrash}
-                      text="Delete"
-                      isDelete={1}
-                      shortcut="Ctrl D"
-                      // handleClick={handleDeleteTodo}
-                    />
-                  </VStack>
+                  </Box>
                 </PopoverBody>
               </PopoverContent>
             </Popover>
@@ -209,7 +236,7 @@ function Option({ icon, text, shortcut, rightIcon, isDelete, handleClick }) {
   return (
     <Button
       variant="ghost"
-      fontWeight={"thin"}
+      fontWeight="normal"
       justifyContent="space-between"
       width="100%"
       height="auto"
@@ -231,18 +258,3 @@ function Option({ icon, text, shortcut, rightIcon, isDelete, handleClick }) {
     </Button>
   );
 }
-
-Option.propTypes = {
-  icon: PropTypes.func,
-  text: PropTypes.string,
-  shortcut: PropTypes.string,
-  rightIcon: PropTypes.string,
-  isDelete: PropTypes.bool,
-  handleClick: PropTypes.func,
-};
-TaskItem.propTypes = {
-  title: PropTypes.string,
-  description: PropTypes.string,
-  isCompleted: PropTypes.bool,
-  priority: PropTypes.string,
-};

@@ -12,12 +12,12 @@ function App() {
     location.pathname === "/auth/login" ||
     location.pathname === "/auth/signup" ||
     location.pathname === "/onboard/create-profile" ||
-    location.pathname === "/onboard/use-case";
+    location.pathname === "/onboard/use-case" ||
     location.pathname === "/home";
 
   return (
     <Box>
-      {/* {!isAuthPage && <Navbar />} */}
+      {!isAuthPage && <Navbar />}
       <AllRoutes />
     </Box>
   );
