@@ -16,11 +16,13 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import todoisLogo from "../../assets/icons8-todoist-logo-120.png";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../../redux/slices/userSlice";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 function CreateProfile() {
-  const user = JSON.parse(localStorage.getItem("currUser"));
-
+  const { user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   console.log("user:", user);
   // const toast = useToast();
@@ -29,11 +31,11 @@ function CreateProfile() {
   const navigate = useNavigate();
 
   let token = localStorage.getItem("todoistAuthToken") || "";
-  if (token) {
-    console.log("user has token");
-  } else {
-    console.log("user has no token");
-  }
+  // if (token) {
+  //   console.log("user has token");
+  // } else {
+  //   console.log("user has no token");
+  // }
 
   const handleUpdateProfile = async () => {
     setIsLoading(true);
@@ -47,6 +49,7 @@ function CreateProfile() {
       );
       if (res.data.status) {
         console.log(res.data);
+        dispatch(updateUser(res.data.data))
         setIsLoading(false);
         navigate("/onboard/use-case");
       }

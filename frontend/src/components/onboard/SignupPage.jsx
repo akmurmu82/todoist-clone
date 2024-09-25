@@ -20,31 +20,36 @@ import { useEffect, useState } from "react";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../../redux/slices/userSlice";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 function SignupPage() {
-  const navigate = useNavigate()
+  const { user } = useSelector((state) => state.user);
+  console.log("user:", user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const toast = useToast();
   const [isPasswordHidden, setIspasswordHidden] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   let token = localStorage.getItem("todoistAuthToken") || "";
-  if (token) {
-    console.log("user has token");
-  } else {
-    console.log("user has no token");
-  }
+  // if (token) {
+  //   console.log("user has token");
+  // } else {
+  //   console.log("user has no token");
+  // }
 
-  useEffect(() => {
-    console.log({ email, password });
-  }, [email, password]);
+  // useEffect(() => {
+  //   console.log({ email, password });
+  // }, [email, password]);
 
   const handleTogglePassword = () => {
     setIspasswordHidden(!isPasswordHidden);
   };
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     try {
       // if(email)
       let res = await axios.post(`${BaseBackendURL}/users/register`, {
@@ -60,14 +65,13 @@ function SignupPage() {
           duration: 9000,
           isClosable: true,
         });
-
         token = res.data.token;
-        localStorage.setItem("todoistAuthToken", token);
-        localStorage.setItem("currUser", JSON.stringify(res.data.newUser));
-        console.log(res);
+        console.log(res, res.data);
+        localStorage.setItem("todoistAuthToken", JSON.stringify(token));
+        dispatch(updateUser(res.data.newUser));
 
         setTimeout(() => {
-          navigate(`/onboard/create-profile`)
+          navigate(`/onboard/create-profile`);
           // window.location.href = "http://localhost:5173/onboard/create-profile";
         }, 3000);
       }
@@ -197,7 +201,7 @@ function SignupPage() {
               ) : null}
             </FormControl>
 
-            {/* Log In Button */}
+            {/* Signup In Button */}
             <Button
               bg={"#e74c3c"}
               color={"#fff"}
@@ -205,7 +209,7 @@ function SignupPage() {
               w="full"
               _hover={{ bg: "#db4c3e" }}
               aria-label="Log in"
-              onClick={handleLogin}
+              onClick={handleSignup}
             >
               Sign up with Email
             </Button>

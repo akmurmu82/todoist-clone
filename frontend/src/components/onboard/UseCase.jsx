@@ -16,11 +16,15 @@ import axios from "axios";
 import { useState } from "react";
 import { FaUser, FaBriefcase, FaGraduationCap } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../../redux/slices/userSlice";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 const UseCase = () => {
-  const user = JSON.parse(localStorage.getItem("currUser"));
+  const { user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  console.log(user);
 
   const [accountType, setAccountType] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,6 +47,7 @@ const UseCase = () => {
       );
       if (res.data.status) {
         console.log(res.data);
+        dispatch(updateUser(res.data.data));
         setIsLoading(false);
         navigate("/home");
       }

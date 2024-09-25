@@ -10,7 +10,7 @@ const getTodos = async (req, res) => {
   try {
     const todos = await TodoModel.find(query).populate("userId");
     if (todos.length === 0) {
-      res.status(200).json({ status: true, message: "No todo found" });
+      return res.status(204).json({ status: true, data:[] });
     }
 
     res.status(200).json({ status: true, data: todos });

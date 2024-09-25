@@ -29,6 +29,7 @@ import {
   FaBell,
   FaChevronDown,
   FaClock,
+  FaPlusCircle,
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
 
@@ -36,6 +37,8 @@ import { DayPicker as Calendar } from "react-day-picker";
 import Sidebar from "../sidebar/Sidebar";
 import TaskItem from "./Task";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { addTodo, loadTodo } from "../../redux/slices/todoSlice";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 const Home = () => {
@@ -47,11 +50,11 @@ const Home = () => {
   // Inside your component
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-  const user = JSON.parse(localStorage.getItem("currUser")) || {};
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
+  const { todos } = useSelector((state) => state.todos);
   const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
-  console.log(user);
-
-  const [todos, setTodos] = useState([]);
+  console.log(user, todos);
 
   const {
     isOpen: isModalOpen,
@@ -65,6 +68,7 @@ const Home = () => {
 
   const [priority, setPriority] = useState(null);
 
+  // formatting the priority before sending the request
   const formatPriority = (priority) => {
     let formattedPriority = "";
     if (priority == 1) {
@@ -73,6 +77,8 @@ const Home = () => {
       formattedPriority = "medium";
     } else if (priority == 3) {
       formattedPriority = "low";
+    } else {
+      formattedPriority = "low"; // setting default priority is "low"
     }
     console.log("formattedPriority:", formattedPriority);
     return formattedPriority;
@@ -115,31 +121,41 @@ const Home = () => {
     setDueDate(date);
   };
 
+  // Fetching Todos
   const fetchTodos = async () => {
-    let res = await axios.get(`${BaseBackendURL}/todos`, {
-      body: { _id: user._id },
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      let res = await axios.get(`${BaseBackendURL}/todos`, {
+        body: { _id: user._id },
 
-    setTodos(res.data.data);
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (res.data.status) {
+        console.log(res.data.data);
+        dispatch(loadTodo(res.data.data));
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    // console.log(todos);
+    console.log("todos:", todos);
   }, [todos]);
 
   useEffect(() => {
     fetchTodos();
   }, []);
 
+  // Adding Todos
   const handleAddTodo = async () => {
     console.log({
       title,
       description,
-      createdOn: dueDate.toLocaleDateString(),
+      createdOn: new Date().toLocaleDateString(),
+      dueDate: dueDate.toLocaleDateString(),
       userId: user._id,
       priority,
       token,
@@ -162,7 +178,11 @@ const Home = () => {
     );
     console.log(res);
     if (res.data.status) {
-      setTodos((prev) => [...prev, res.data.data]);
+      dispatch(addTodo(res.data.data));
+      onModalClose();
+      setDueDate("");
+      setTitle("");
+      setDescription("");
     }
   };
 
@@ -183,15 +203,32 @@ const Home = () => {
         <Heading>Inbox</Heading>
 
         {/* Listing Todos */}
-        {todos.map(({ _id, title, description, isCompleted, priority }) => (
-          <TaskItem
-            key={_id}
-            title={title}
-            description={description}
-            isCompleted={isCompleted}
-            priority={priority}
-          />
-        ))}
+        {todos.length == 0 ? (
+          <h1>No todos to show</h1>
+        ) : (
+          todos.map(({ _id, title, description, isCompleted, priority }) => (
+            <TaskItem
+              key={_id}
+              todoId={_id}
+              title={title}
+              description={description}
+              isCompleted={isCompleted}
+              priority={priority}
+            />
+          ))
+        )}
+        {/* Add Task */}
+        <HStack
+          width="100%"
+          py={2}
+          px={4}
+          borderRadius="md"
+          _hover={{ color: "#db4c3e", cursor: "pointer" }}
+          onClick={toggleOnModalOpen}
+        >
+          <FaPlusCircle />
+          <Text>Add Task</Text>
+        </HStack>
       </Box>
 
       {/* Add Task Modal */}
@@ -333,7 +370,12 @@ const Home = () => {
               <Button variant="ghost" onClick={onModalClose}>
                 Cancel
               </Button>
-              <Button colorScheme="red" ml={3} onClick={handleAddTodo}>
+              <Button
+                colorScheme="red"
+                ml={3}
+                onClick={handleAddTodo}
+                isDisabled={!title || !dueDate}
+              >
                 Add task
               </Button>
             </HStack>

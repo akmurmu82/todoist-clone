@@ -17,6 +17,7 @@ const loginUser = async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, dbUser.password);
+    // is the isMatch a boolean or the user?
 
     if (!isMatch) {
       return res.status(409).json({ status: false, message: "Wrong password" });
@@ -25,8 +26,6 @@ const loginUser = async (req, res) => {
     const token = jwt.sign(
       {
         userId: dbUser._id,
-        name: dbUser.name,
-        email: dbUser.email,
       },
       jwtSecret
     );
@@ -35,6 +34,7 @@ const loginUser = async (req, res) => {
       status: true,
       message: "User logged in successfully",
       token,
+      user: dbUser,
     });
   } catch (error) {
     res.status(500).json({ status: false, message: error });

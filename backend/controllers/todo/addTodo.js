@@ -5,10 +5,11 @@ const jwtSecret = process.env.JWT_SECRET;
 
 const addTodos = async (req, res) => {
   try {
-    const { title, description, createdOn, userId, priority } = req.body;
+    const { title, description, dueData, createdOn, userId, priority } =
+      req.body;
     // console.log(title, description, createdOn, userId || priority);
 
-    if (!title || !description || !userId || !priority) {
+    if (!title || !userId) {
       return res
         .status(400)
         .json({ status: false, message: "required fields are missing!" });
@@ -27,6 +28,7 @@ const addTodos = async (req, res) => {
       createdOn,
       userId,
       priority,
+      dueData
     });
 
     await newTodo.save();

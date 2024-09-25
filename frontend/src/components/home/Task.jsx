@@ -36,14 +36,49 @@ import {
 } from "react-icons/fa";
 import { RiSofaLine } from "react-icons/ri";
 import { RxValueNone } from "react-icons/rx";
+import PropTypes from "prop-types";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { deleteTodo, updateTodo } from "../../redux/slices/todoSlice";
+const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
+const token = JSON.parse(localStorage.getItem("todoistAuthToken"));
 
-export default function Component({ title = "Sample Task", description = "This is a sample task description", isCompleted = false, priority = "medium" }) {
+export default function TaskItem({
+  title = "Sample Task",
+  todoId,
+  description = "This is a sample task description",
+  isCompleted = false,
+  priority = "medium",
+}) {
+  const dispatch = useDispatch();
   const [isHovering, setIsHovering] = useState(false);
+
+  // Delete Todo
+  const handleDeleteTodo = async () => {
+    try {
+      let res = await axios.delete(`${BaseBackendURL}/todos/delete/${todoId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (res.status) {
+        console.log(res);
+        dispatch(deleteTodo(todoId));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Box
       borderBottomWidth={1}
+      borderRadius={"md"}
       py={2}
+      // color="#f3f3f3"
+      // bg={'linear-gradient(to right, #db4c3e 0%, #f19696 100%)'}
+      px={2}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -86,13 +121,17 @@ export default function Component({ title = "Sample Task", description = "This i
               strategy="fixed"
               modifiers={[
                 {
-                  name: 'flip',
+                  name: "flip",
                   options: {
-                    fallbackPlacements: ['top-end', 'bottom-start', 'top-start'],
+                    fallbackPlacements: [
+                      "top-end",
+                      "bottom-start",
+                      "top-start",
+                    ],
                   },
                 },
                 {
-                  name: 'preventOverflow',
+                  name: "preventOverflow",
                   options: {
                     padding: 8,
                   },
@@ -110,20 +149,24 @@ export default function Component({ title = "Sample Task", description = "This i
                     maxHeight="400px"
                     overflowY="auto"
                     css={{
-                      '&::-webkit-scrollbar': {
-                        width: '4px',
+                      "&::-webkit-scrollbar": {
+                        width: "4px",
                       },
-                      '&::-webkit-scrollbar-track': {
-                        width: '6px',
+                      "&::-webkit-scrollbar-track": {
+                        width: "6px",
                       },
-                      '&::-webkit-scrollbar-thumb': {
-                        background: 'gray.300',
-                        borderRadius: '24px',
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "gray.300",
+                        borderRadius: "24px",
                       },
                     }}
                   >
                     <VStack align="stretch" spacing={0} divider={<Divider />}>
-                      <Option icon={FaPencilAlt} text="Edit" shortcut="Ctrl E" />
+                      <Option
+                        icon={FaPencilAlt}
+                        text="Edit"
+                        shortcut="Ctrl E"
+                      />
                       <Option
                         icon={FaProjectDiagram}
                         text="Go to project"
@@ -219,6 +262,7 @@ export default function Component({ title = "Sample Task", description = "This i
                         text="Delete"
                         isDelete={true}
                         shortcut="Ctrl D"
+                        handleClick={handleDeleteTodo}
                       />
                     </VStack>
                   </Box>
@@ -258,3 +302,21 @@ function Option({ icon, text, shortcut, rightIcon, isDelete, handleClick }) {
     </Button>
   );
 }
+
+// Prop Validation
+TaskItem.propTypes = {
+  todoId: PropTypes.string,
+  title: PropTypes.string,
+  description: PropTypes.string,
+  priority: PropTypes.string,
+  isCompleted: PropTypes.bool,
+};
+
+Option.propTypes = {
+  icon: PropTypes.func,
+  text: PropTypes.string,
+  shortcut: PropTypes.string,
+  rightIcon: PropTypes.func,
+  isDelete: PropTypes.bool,
+  handleClick: PropTypes.func,
+};

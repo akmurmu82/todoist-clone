@@ -33,6 +33,7 @@ const MenuItems = ({ toggleOnModalOpen }) => {
         width="100%"
         py={2}
         px={4}
+        borderRadius="md"
         color={"#db4c3e"}
         _hover={{ bg: "gray.100", cursor: "pointer" }}
         onClick={toggleOnModalOpen}
@@ -45,6 +46,7 @@ const MenuItems = ({ toggleOnModalOpen }) => {
       <HStack
         width="100%"
         py={2}
+        borderRadius="md"
         px={4}
         _hover={{ bg: "gray.100", cursor: "pointer" }}
         onClick={() => setActiveMenu("Search")}

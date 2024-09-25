@@ -5,8 +5,9 @@ const todoSchema = mongoose.Schema({
   createdOn: { type: String },
   isCompleted: { type: Boolean, default: false, enum: [true, false] },
   description: { type: String },
-  priority: { type: String, enum: ["low", "medium", "high"] },
+  priority: { type: String, default: "low", enum: ["low", "medium", "high"] },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
+  dueData: { type: String },
 });
 
 const TodoModel = mongoose.model("todo", todoSchema);
