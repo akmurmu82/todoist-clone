@@ -5,9 +5,9 @@ const jwtSecret = process.env.JWT_SECRET;
 
 const addTodos = async (req, res) => {
   try {
-    const { title, description, dueData, createdOn, userId, priority } =
-      req.body;
-    // console.log(title, description, createdOn, userId || priority);
+    const { title, description, dueDate, userId, priority } = req.body;
+    console.log({ title, description, dueDate, userId, priority });
+    // console.log("adding...");
 
     if (!title || !userId) {
       return res
@@ -25,10 +25,9 @@ const addTodos = async (req, res) => {
     const newTodo = new TodoModel({
       title,
       description,
-      createdOn,
       userId,
       priority,
-      dueData
+      dueDate,
     });
 
     await newTodo.save();

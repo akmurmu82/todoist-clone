@@ -1,0 +1,5 @@
+##Bugs:
+
+ 1. when the documents are deleted from the database, and if we
+ try to refresh to reflect the database documents, its not happening.
+ We get the documents from the redux store.

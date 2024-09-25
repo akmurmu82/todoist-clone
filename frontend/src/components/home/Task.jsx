@@ -23,9 +23,7 @@ import {
   FaEllipsisH,
   FaProjectDiagram,
   FaSun,
-  FaRegCalendarAlt,
   FaRedo,
-  FaClock,
   FaFlag,
   FaBell,
   FaCheckCircle,
@@ -39,7 +37,7 @@ import { RxValueNone } from "react-icons/rx";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { deleteTodo, updateTodo } from "../../redux/slices/todoSlice";
+import { deleteTodo } from "../../redux/slices/todoSlice";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 const token = JSON.parse(localStorage.getItem("todoistAuthToken"));
 
@@ -48,7 +46,8 @@ export default function TaskItem({
   todoId,
   description = "This is a sample task description",
   isCompleted = false,
-  priority = "medium",
+  // priority = "medium",
+  // toggleOnModalOpen
 }) {
   const dispatch = useDispatch();
   const [isHovering, setIsHovering] = useState(false);
@@ -109,6 +108,7 @@ export default function TaskItem({
               icon={<FaPencilAlt />}
               size="sm"
               variant="ghost"
+              // onClick={}
             />
             <IconButton
               aria-label="Comment on task"

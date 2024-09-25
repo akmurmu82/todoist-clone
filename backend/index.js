@@ -8,7 +8,6 @@ require("dotenv").config();
 
 // Environmental variable
 const mongo_uri = process.env.MONGO_URI; // setup the mongoURI first
-// console.log(mongo_uri)
 const port = process.env.PORT;
 
 // intialising server/app
