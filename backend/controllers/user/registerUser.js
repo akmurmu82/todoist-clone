@@ -25,7 +25,7 @@ const registerUser = async (req, res) => {
       accountType,
     });
 
-    console.log(newUser);
+    // console.log(newUser);
 
     const token = jwt.sign(
       {
