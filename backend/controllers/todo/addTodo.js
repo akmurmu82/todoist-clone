@@ -6,7 +6,7 @@ const jwtSecret = process.env.JWT_SECRET;
 const addTodos = async (req, res) => {
   try {
     const { title, description, dueDate, userId, priority } = req.body;
-    console.log({ title, description, dueDate, userId, priority });
+    // console.log({ title, description, dueDate, userId, priority });
     // console.log("adding...");
 
     if (!title || !userId) {
