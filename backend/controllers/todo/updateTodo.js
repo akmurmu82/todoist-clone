@@ -24,7 +24,6 @@ const updateTodos = async (req, res) => {
     if (!updatedTodo) {
       return res.status(404).json({ status: false, message: "Todo not found" });
     }
-    console.log("updatedTodo:", updatedTodo);
     res.status(200).json({ status: true, data: updatedTodo });
   } catch (error) {
     return res
