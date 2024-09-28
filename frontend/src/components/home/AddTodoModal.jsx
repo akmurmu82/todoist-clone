@@ -29,20 +29,42 @@ import {
   FaInbox,
   FaRegCalendar,
 } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { addTodo } from "../../redux/slices/todoSlice";
+import { addTodo, updateTodo } from "../../redux/slices/todoSlice";
 
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
-function AddTodoModal({ isModalOpen, onModalClose }) {
-  const [dueDate, setDueDate] = useState(null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const dispatch = useDispatch();
+function AddTodoModal({
+  currTodoId,
+  setCurrTodoId,
+  isModalOpen,
+  onModalClose,
+}) {
   const { user } = useSelector((state) => state.user);
-  //   const { todos } = useSelector((state) => state.todos);
+  const { todos } = useSelector((state) => state.todos);
+  const dispatch = useDispatch();
+  const [currTodo] = todos.filter((todo) => todo._id === currTodoId);
+  const [title, setTitle] = useState(currTodoId ? currTodo.title : "");
+  const [dueDate, setDueDate] = useState(currTodoId ? currTodo.dueDate : "");
+  const [description, setDescription] = useState(
+    currTodoId ? currTodo.description : ""
+  );
+
+  useEffect(() => {
+    if (currTodo) {
+      setTitle(currTodo.title || "");
+      setDueDate(currTodo.dueDate || "");
+      setDescription(currTodo.description || "");
+    } else {
+      // If there's no currTodo, reset to default controlled values
+      setTitle("");
+      setDueDate("");
+      setDescription("");
+      setCurrTodoId(null);
+    }
+  }, [currTodoId, currTodo]);
 
   // Inside your component
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -63,7 +85,6 @@ function AddTodoModal({ isModalOpen, onModalClose }) {
     } else {
       formattedPriority = "low"; // setting default priority is "low"
     }
-    console.log("formattedPriority:", formattedPriority);
     return formattedPriority;
   };
 
@@ -100,19 +121,14 @@ function AddTodoModal({ isModalOpen, onModalClose }) {
   };
 
   const handleCalendarSelect = (date) => {
-    // console.log("date:", date.toLocaleDateString());
     setDueDate(date);
   };
 
   // Adding Todos
   const handleAddTodo = async () => {
-    console.log({
-      title,
-      description,
-      dueDate: dueDate.toLocaleDateString(),
-      userId: user._id,
-      priority: formatPriority(priority),
-    });
+    setDueDate("");
+    setTitle("");
+    setDescription("");
     let res = await axios.post(
       `${BaseBackendURL}/todos/add`,
       {
@@ -129,13 +145,45 @@ function AddTodoModal({ isModalOpen, onModalClose }) {
         },
       }
     );
-    console.log(res);
+    // console.log(res);
     if (res.data.status) {
       dispatch(addTodo(res.data.data));
       onModalClose();
-      setDueDate("");
-      setTitle("");
-      setDescription("");
+    }
+  };
+
+  // Update Todos
+  const handleUpdateTodo = async () => {
+    try {
+      let res = await axios.patch(
+        `${BaseBackendURL}/todos/update/${currTodoId}`,
+        {
+          title,
+          description,
+          dueDate:
+            typeof dueDate !== "string"
+              ? dueDate.toLocaleDateString()
+              : dueDate,
+          userId: user._id,
+          priority: formatPriority(priority),
+        },
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      // console.log(res);
+      if (res.data.status) {
+        dispatch(updateTodo({ currTodoId, newTodo: res.data.data }));
+        onModalClose();
+        setDueDate("");
+        setTitle("");
+        setDescription("");
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -175,7 +223,11 @@ function AddTodoModal({ isModalOpen, onModalClose }) {
                   size="sm"
                   leftIcon={<Icon as={FaRegCalendar} />}
                 >
-                  {dueDate ? dueDate.toLocaleDateString() : "Due date"}
+                  {dueDate
+                    ? typeof dueDate !== "string"
+                      ? dueDate.toLocaleDateString()
+                      : dueDate
+                    : "Due date"}
                 </Button>
               </PopoverTrigger>
 
@@ -281,10 +333,16 @@ function AddTodoModal({ isModalOpen, onModalClose }) {
             <Button
               colorScheme="red"
               ml={3}
-              onClick={handleAddTodo}
+              onClick={() => {
+                if (currTodoId) {
+                  handleUpdateTodo();
+                } else {
+                  handleAddTodo();
+                }
+              }}
               isDisabled={!title || !dueDate}
             >
-              Add task
+              {currTodoId ? "Update task" : "Add task"}
             </Button>
           </HStack>
         </ModalFooter>
@@ -294,6 +352,8 @@ function AddTodoModal({ isModalOpen, onModalClose }) {
 }
 
 AddTodoModal.propTypes = {
+  currTodoId: PropTypes.string,
+  setCurrTodoId: PropTypes.func,
   isModalOpen: PropTypes.bool.isRequired,
   onModalClose: PropTypes.func.isRequired,
 };

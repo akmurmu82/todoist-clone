@@ -47,13 +47,14 @@ export default function TaskItem({
   description = "This is a sample task description",
   isCompleted = false,
   // priority = "medium",
-  // toggleOnModalOpen
+  toggleOnModalOpen,
 }) {
   const dispatch = useDispatch();
   const [isHovering, setIsHovering] = useState(false);
 
   // Delete Todo
   const handleDeleteTodo = async () => {
+    console.log(token);
     try {
       let res = await axios.delete(`${BaseBackendURL}/todos/delete/${todoId}`, {
         headers: {
@@ -69,6 +70,10 @@ export default function TaskItem({
       console.log(error);
     }
   };
+
+  const passTaskData = ()=> {
+    toggleOnModalOpen(todoId)
+  }
 
   return (
     <Box
@@ -108,7 +113,7 @@ export default function TaskItem({
               icon={<FaPencilAlt />}
               size="sm"
               variant="ghost"
-              // onClick={}
+              onClick={()=>toggleOnModalOpen(todoId)}
             />
             <IconButton
               aria-label="Comment on task"
@@ -310,6 +315,7 @@ TaskItem.propTypes = {
   description: PropTypes.string,
   priority: PropTypes.string,
   isCompleted: PropTypes.bool,
+  toggleOnModalOpen: PropTypes.func,
 };
 
 Option.propTypes = {

@@ -30,10 +30,10 @@ const todoSlice = createSlice({
 
     // Update todo
     updateTodo: (state, action) => {
-      const { _id, newTodo } = action.payload;
-      const todoIndex = state.todos.findIndex((todo) => todo._id === _id);
+      const { currTodoId, newTodo } = action.payload;
+      console.log("updating...", currTodoId, newTodo); // here is the problem
+      const todoIndex = state.todos.findIndex((todo) => todo._id === currTodoId);
       if (todoIndex !== -1) {
-        console.log("updating..."); // here is the problem
         state.todos[todoIndex] = { ...state.todos[todoIndex], ...newTodo }; // Update the todo by merging new data
       }
     },

@@ -1,6 +1,6 @@
 import { Box, HStack, Text, useDisclosure, Heading } from "@chakra-ui/react";
 import { FaPlusCircle } from "react-icons/fa";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import Sidebar from "../sidebar/Sidebar";
 import TaskItem from "./Task";
@@ -16,7 +16,7 @@ const Home = () => {
   const { user } = useSelector((state) => state.user);
   const { todos } = useSelector((state) => state.todos);
   const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
-  // console.log(user, todos);
+  const [currTodoId, setCurrTodoId] = useState(null);
 
   const {
     isOpen: isModalOpen,
@@ -24,7 +24,12 @@ const Home = () => {
     onClose: onModalClose,
   } = useDisclosure();
 
-  function toggleOnModalOpen() {
+  function toggleOnModalOpen(todoId) {
+    if (typeof todoId === "string") {
+      setCurrTodoId(todoId);
+    } else {
+      setCurrTodoId(null);
+    }
     onModalOpen();
     onClose();
   }
@@ -41,17 +46,13 @@ const Home = () => {
         },
       });
       if (res.data.status) {
-        console.log(res.data.data);
+        // console.log(res.data.data);
         dispatch(loadTodo(res.data.data));
       }
     } catch (error) {
       console.log(error);
     }
   };
-
-  useEffect(() => {
-    console.log("todos:", todos);
-  }, [todos]);
 
   useEffect(() => {
     fetchTodos();
@@ -104,7 +105,12 @@ const Home = () => {
       </Box>
 
       {/* Add Task Modal */}
-      <AddTodoModal isModalOpen={isModalOpen} onModalClose={onModalClose} />
+      <AddTodoModal
+        currTodoId={currTodoId}
+        setCurrTodoId={setCurrTodoId}
+        isModalOpen={isModalOpen}
+        onModalClose={onModalClose}
+      />
     </>
   );
 };
