@@ -16,6 +16,7 @@ import {
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
+  Spinner,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -45,6 +46,7 @@ function AddTodoModal({
   const { user } = useSelector((state) => state.user);
   const { todos } = useSelector((state) => state.todos);
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   const [currTodo] = todos.filter((todo) => todo._id === currTodoId);
   const [title, setTitle] = useState(currTodoId ? currTodo.title : "");
   const [dueDate, setDueDate] = useState(currTodoId ? currTodo.dueDate : "");
@@ -126,34 +128,42 @@ function AddTodoModal({
 
   // Adding Todos
   const handleAddTodo = async () => {
-    setDueDate("");
-    setTitle("");
-    setDescription("");
-    let res = await axios.post(
-      `${BaseBackendURL}/todos/add`,
-      {
-        title,
-        description,
-        dueDate: dueDate.toLocaleDateString(),
-        userId: user._id,
-        priority: formatPriority(priority),
-      },
-      {
-        headers: {
-          authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+    try {
+      setDueDate("");
+      setTitle("");
+      setDescription("");
+      setIsLoading(true);
+      let res = await axios.post(
+        `${BaseBackendURL}/todos/add`,
+        {
+          title,
+          description,
+          dueDate: dueDate.toLocaleDateString(),
+          userId: user._id,
+          priority: formatPriority(priority),
         },
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      // console.log(res);
+      if (res.data.status) {
+        setIsLoading(false);
+        dispatch(addTodo(res.data.data));
+        onModalClose();
       }
-    );
-    // console.log(res);
-    if (res.data.status) {
-      dispatch(addTodo(res.data.data));
-      onModalClose();
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
     }
   };
 
   // Update Todos
   const handleUpdateTodo = async () => {
+    setIsLoading(true);
     try {
       let res = await axios.patch(
         `${BaseBackendURL}/todos/update/${currTodoId}`,
@@ -176,6 +186,7 @@ function AddTodoModal({
       );
       // console.log(res);
       if (res.data.status) {
+        setIsLoading(false);
         dispatch(updateTodo({ currTodoId, newTodo: res.data.data }));
         onModalClose();
         setDueDate("");
@@ -183,6 +194,7 @@ function AddTodoModal({
         setDescription("");
       }
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
   };
@@ -342,7 +354,13 @@ function AddTodoModal({
               }}
               isDisabled={!title || !dueDate}
             >
-              {currTodoId ? "Update task" : "Add task"}
+              {isLoading ? (
+                <Spinner />
+              ) : currTodoId ? (
+                "Update task"
+              ) : (
+                "Add task"
+              )}
             </Button>
           </HStack>
         </ModalFooter>

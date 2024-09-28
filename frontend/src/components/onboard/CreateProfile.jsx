@@ -49,7 +49,7 @@ function CreateProfile() {
       );
       if (res.data.status) {
         console.log(res.data);
-        dispatch(updateUser(res.data.data))
+        dispatch(updateUser(res.data.data));
         setIsLoading(false);
         navigate("/onboard/use-case");
       }
@@ -66,11 +66,10 @@ function CreateProfile() {
         w={"100vw"}
         justifyContent={"center"}
         alignItems={"center"}
+        direction={"column"}
       >
-        <Box>
-          <Image alt="asdf" src={todoisLogo}></Image>
-          <Spinner color="red" />
-        </Box>
+        <Image alt="asdf" src={todoisLogo}></Image>
+        <Spinner color="red" />
       </Flex>
     );
 

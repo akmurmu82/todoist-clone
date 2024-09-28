@@ -15,6 +15,7 @@ import MenuItems from "../home/MenuItems";
 import { useSelector } from "react-redux";
 import { BsLayoutSidebar } from "react-icons/bs";
 import { IoNotificationsOutline } from "react-icons/io5";
+import ProfilePopover from "./ProfilePopover";
 
 const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose }) => {
   const { user } = useSelector((state) => state.user);
@@ -52,29 +53,41 @@ const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose }) => {
             <DrawerBody p={4}>
               {/* User Profile */}
               <HStack mb={6}>
-                <Flex
-                  width="100%"
-                  alignItems={"center"}
-                  py={0}
-                  px={4}
-                  color={"#db4c3e"}
-                  _hover={{ bg: "gray.100", cursor: "pointer" }}
-                >
-                  <Avatar
-                    name="User Name"
-                    mr={2}
-                    boxSize={10}
-                    src="https://bit.ly/dan-abramov"
-                  />
-                  <Text>{user.name ? user.name : user.email}</Text>
-                </Flex>
-                <IconButton icon={<IoNotificationsOutline />} />
-                <IconButton
-                  icon={<BsLayoutSidebar />}
-                  onClick={onClose}
-                  aria-label="Close Menu"
-                />
+                <ProfilePopover
+                  user={user}
+                  trigger={
+                    <Flex
+                      alignItems="center"
+                      py={2}
+                      px={4}
+                      _hover={{ bg: "gray.100", cursor: "pointer" }}
+                      borderRadius="md"
+                    >
+                      <Avatar
+                        name={user.name || user.email}
+                        src={user.avatar}
+                        size="sm"
+                        mr={2}
+                      />
+                      <Text fontWeight="bold">
+                        {user.name.substring(0, 10) + "..." ||
+                          user.email.substring(0, 10) + "..."}
+                      </Text>
+                    </Flex>
+                  }
+                  icons={
+                    <>
+                      <IconButton icon={<IoNotificationsOutline />} />
+                      <IconButton
+                        icon={<BsLayoutSidebar />}
+                        onClick={onClose}
+                        aria-label="Close Menu"
+                      />
+                    </>
+                  }
+                ></ProfilePopover>
               </HStack>
+
               <MenuItems toggleOnModalOpen={toggleOnModalOpen} />
             </DrawerBody>
           </Box>
@@ -95,29 +108,42 @@ const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose }) => {
       >
         {/* User Profile */}
         <HStack mb={6}>
-          <Flex
-            width="100%"
-            alignItems={"center"}
-            py={0}
-            px={4}
-            fontWeight={"bold"}
-            _hover={{ bg: "gray.100", cursor: "pointer" }}
-            borderRadius="md"
-          >
-            <Avatar
-              name="User Name"
-              mr={2}
-              boxSize={10}
-              src="https://bit.ly/dan-abramov"
-            />
-            <Text>{user.name ? user.name : user.email}</Text>
-          </Flex>
-          <IconButton icon={<IoNotificationsOutline />} />
-          <IconButton
-            icon={<BsLayoutSidebar />}
-            onClick={onClose}
-            aria-label="Close Menu"
-          />
+          <ProfilePopover
+            user={user}
+            trigger={
+              <Flex
+                width="100%"
+                alignItems={"center"}
+                py={0}
+                px={4}
+                fontWeight={"bold"}
+                _hover={{ bg: "gray.100", cursor: "pointer" }}
+                borderRadius="md"
+              >
+                <Avatar
+                  name="User Name"
+                  mr={2}
+                  boxSize={10}
+                  src="https://bit.ly/dan-abramov"
+                />
+                <Text>
+                  {user.name
+                    ? user.name.substring(0, 10) + "..."
+                    : user.email.substring(0, 10) + "..."}
+                </Text>
+              </Flex>
+            }
+            icons={
+              <>
+                <IconButton icon={<IoNotificationsOutline />} />
+                <IconButton
+                  icon={<BsLayoutSidebar />}
+                  onClick={onClose}
+                  aria-label="Close Menu"
+                />
+              </>
+            }
+          ></ProfilePopover>
         </HStack>
 
         <MenuItems toggleOnModalOpen={toggleOnModalOpen} />

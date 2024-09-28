@@ -71,10 +71,6 @@ export default function TaskItem({
     }
   };
 
-  const passTaskData = ()=> {
-    toggleOnModalOpen(todoId)
-  }
-
   return (
     <Box
       borderBottomWidth={1}
@@ -113,7 +109,7 @@ export default function TaskItem({
               icon={<FaPencilAlt />}
               size="sm"
               variant="ghost"
-              onClick={()=>toggleOnModalOpen(todoId)}
+              onClick={() => toggleOnModalOpen(todoId)}
             />
             <IconButton
               aria-label="Comment on task"
@@ -171,11 +167,6 @@ export default function TaskItem({
                         icon={FaPencilAlt}
                         text="Edit"
                         shortcut="Ctrl E"
-                      />
-                      <Option
-                        icon={FaProjectDiagram}
-                        text="Go to project"
-                        shortcut="G"
                       />
 
                       <VStack align="stretch" p={2} spacing={1}>
@@ -245,12 +236,6 @@ export default function TaskItem({
                         </HStack>
                       </VStack>
 
-                      <Option icon={FaBell} text="Reminders" />
-                      <Option
-                        icon={FaCheckCircle}
-                        text="Complete recurring task"
-                        rightIcon={FaArrowRight}
-                      />
                       <Option
                         icon={FaArrowRight}
                         text="Move to..."

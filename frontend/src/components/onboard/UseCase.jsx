@@ -64,11 +64,10 @@ const UseCase = () => {
         w={"100vw"}
         justifyContent={"center"}
         alignItems={"center"}
+        direction={"column"}
       >
-        <Box>
-          <Image alt="asdf" src={todoisLogo}></Image>
-          <Spinner color="red" />
-        </Box>
+        <Image alt="asdf" src={todoisLogo}></Image>
+        <Spinner color="red" />
       </Flex>
     );
   return (

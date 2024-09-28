@@ -14,6 +14,7 @@ import {
   InputGroup,
   FormErrorMessage,
   useToast,
+  Spinner,
 } from "@chakra-ui/react";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
@@ -33,23 +34,16 @@ function SignupPage() {
   const [isPasswordHidden, setIspasswordHidden] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   let token = localStorage.getItem("todoistAuthToken") || "";
-  // if (token) {
-  //   console.log("user has token");
-  // } else {
-  //   console.log("user has no token");
-  // }
-
-  // useEffect(() => {
-  //   console.log({ email, password });
-  // }, [email, password]);
 
   const handleTogglePassword = () => {
     setIspasswordHidden(!isPasswordHidden);
   };
 
   const handleSignup = async () => {
+    setIsLoading(true);
     try {
       // if(email)
       let res = await axios.post(`${BaseBackendURL}/users/register`, {
@@ -57,6 +51,7 @@ function SignupPage() {
         password,
       });
       if (res.data.status) {
+        setIsLoading(false);
         toast({
           position: "top",
           title: "Account created.",
@@ -70,12 +65,13 @@ function SignupPage() {
         localStorage.setItem("todoistAuthToken", JSON.stringify(token));
         dispatch(updateUser(res.data.newUser));
 
-        setTimeout(() => {
-          navigate(`/onboard/create-profile`);
-          // window.location.href = "http://localhost:5173/onboard/create-profile";
-        }, 3000);
+        // setTimeout(() => {
+        navigate(`/onboard/create-profile`);
+        // window.location.href = "http://localhost:5173/onboard/create-profile";
+        // }, 3000);
       }
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
   };
@@ -211,7 +207,7 @@ function SignupPage() {
               aria-label="Log in"
               onClick={handleSignup}
             >
-              Sign up with Email
+              {isLoading ? <Spinner /> : "Sign up with Email"}
             </Button>
 
             {/* Terms and Privacy Notice */}

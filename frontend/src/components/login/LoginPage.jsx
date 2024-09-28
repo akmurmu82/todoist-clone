@@ -15,6 +15,7 @@ import {
   InputGroup,
   FormErrorMessage,
   Spacer,
+  Spinner,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
@@ -30,6 +31,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [isEmailInvalid, setIsEmailInvalid] = useState(false);
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleTogglePassword = () => {
@@ -55,14 +57,19 @@ function LoginPage() {
     }
 
     try {
+      setIsLoading(true);
       const res = await axios.post(`${BaseBackendURL}/users/login`, {
         email,
         password,
       });
-      const token = res.data.token;
-      localStorage.setItem("todoistAuthToken", JSON.stringify(token));
-      navigate(`/home`);
+      if (res.data.status) {
+        setIsLoading(false);
+        const token = res.data.token;
+        localStorage.setItem("todoistAuthToken", JSON.stringify(token));
+        navigate(`/home`);
+      }
     } catch (error) {
+      setIsLoading(false);
       if (error.response) {
         // Display the message returned by the server, or a generic error message
         setErrorMessage(error.response.data.message || "An error occurred");
@@ -202,9 +209,10 @@ function LoginPage() {
               fontSize={"lg"}
               w="full"
               _hover={{ bg: "#db4c3e" }}
+              isDisabled={isLoading}
               onClick={handleLogin}
             >
-              Log in
+              {isLoading ? <Spinner /> : "Log in"}
             </Button>
 
             {/* Forgot Password Link */}

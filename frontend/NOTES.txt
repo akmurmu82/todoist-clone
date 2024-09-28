@@ -1,5 +1,15 @@
+##Feature:
+
+1. If the has already logged in, just redirect they to home page.
+
 ##Bugs:
 
  1. when the documents are deleted from the database, and if we
  try to refresh to reflect the database documents, its not happening.
  We get the documents from the redux store.
+
+2. The profile details on home
+
+3. Error boundry
+
+4. User already exist (while signup)
