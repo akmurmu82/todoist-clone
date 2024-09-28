@@ -110,8 +110,8 @@ Option.propTypes = {
 
 ProfilePopover.propTypes = {
   user: PropTypes.object,
-  trigger: PropTypes.object,
-  icons: PropTypes.object,
+  trigger: PropTypes.element,
+  icons: PropTypes.element,
 };
 
 export default ProfilePopover;

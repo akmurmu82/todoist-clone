@@ -6,6 +6,7 @@ import SignupPage from "./components/onboard/SignupPage";
 import Home from "./components/home/Home";
 import CreateProfile from "./components/onboard/CreateProfile";
 import UseCase from "./components/onboard/UseCase";
+import PrivateRoute from "./ProtectRoute";
 
 function AllRoutes() {
   return (
@@ -13,9 +14,17 @@ function AllRoutes() {
       <Route path="/" element={<LandingSection />} />
       <Route path="/auth/login" element={<LoginPage />} />
       <Route path="/auth/signup" element={<SignupPage />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/onboard/create-profile" element={<CreateProfile />} />
-      <Route path="/onboard/use-case" element={<UseCase />} />
+
+      {/* Protected routes */}
+      <Route path="/home" element={<PrivateRoute element={<Home />} />} />
+      <Route
+        path="/onboard/create-profile"
+        element={<PrivateRoute element={<CreateProfile />} />}
+      />
+      <Route
+        path="/onboard/use-case"
+        element={<PrivateRoute element={<UseCase />} />}
+      />
     </Routes>
   );
 }
