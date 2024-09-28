@@ -13,3 +13,5 @@
 3. Error boundry
 
 4. User already exist (while signup)
+
+5. Responsive Landing Page
