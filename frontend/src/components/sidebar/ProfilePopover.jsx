@@ -32,6 +32,10 @@ function ProfilePopover({ user, trigger, icons }) {
     persistor.purge().then(() => {
       navigate("/");
     });
+    // Clear local storage
+    // localStorage.removeItem("persist:root");
+    // localStorage.removeItem("persist:user");
+    localStorage.removeItem("todoistAuthToken");
   };
   return (
     <Popover placement="bottom-start">

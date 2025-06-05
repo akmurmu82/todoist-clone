@@ -19,6 +19,7 @@ import ProfilePopover from "./ProfilePopover";
 
 const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose }) => {
   const { user } = useSelector((state) => state.user);
+  console.log("user:", user)
   return (
     <>
       {/* Mobile View */}
@@ -65,7 +66,7 @@ const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose }) => {
                     >
                       <Avatar
                         name={user.name || user.email}
-                        src={user.avatar}
+                        src={user.profilePic}
                         size="sm"
                         mr={2}
                       />
@@ -124,12 +125,15 @@ const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose }) => {
                   name="User Name"
                   mr={2}
                   boxSize={10}
-                  src="https://bit.ly/dan-abramov"
+                  src={user.profilePic || "https://bit.ly/dan-abramov"}
                 />
                 <Text>
-                  {user.name
-                    ? user.name.substring(0, 10) + "..."
+                  {user?.name
+                    ? user.name
                     : user.email.substring(0, 10) + "..."}
+                  {/* {user?.name.length > 10 ? user.name.substring(0, 10)
+                    : user.name.substring(0, 10) + "..."
+                    || user.email.substring(0, 10) + "..."} */}
                 </Text>
               </Flex>
             }

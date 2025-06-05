@@ -17,7 +17,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -50,15 +50,14 @@ function SignupPage() {
         email,
         password,
       });
+
       if (res.data.status) {
-        setIsLoading(false);
         toast({
           position: "top",
           title: "Account created.",
           description: "We've created your account for you.",
           status: "success",
-          duration: 9000,
-          isClosable: true,
+          duration: 3000,
         });
         token = res.data.token;
         console.log(res, res.data);
@@ -71,8 +70,9 @@ function SignupPage() {
         // }, 3000);
       }
     } catch (error) {
-      setIsLoading(false);
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,7 +87,7 @@ function SignupPage() {
         direction={{ base: "column", lg: "row" }}
         alignItems={{ lg: "center" }}
         justify={"space-between"}
-        // justify={{ base: "flex-end", lg: "space-between" }}
+      // justify={{ base: "flex-end", lg: "space-between" }}
       >
         <Box w={{ base: "100%", lg: "45%" }} mb={{ base: 8, lg: 0 }}>
           {/* Logo */}

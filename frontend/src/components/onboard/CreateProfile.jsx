@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  ButtonSpinner,
   Flex,
   FormControl,
   FormLabel,
@@ -9,6 +10,7 @@ import {
   Spinner,
   Stack,
   Text,
+  useToast,
   // useToast,
 } from "@chakra-ui/react";
 import PropTypes from "prop-types";
@@ -19,23 +21,20 @@ import todoisLogo from "../../assets/icons8-todoist-logo-120.png";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../../redux/slices/userSlice";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
+const cloudinaryCloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 
 function CreateProfile() {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   console.log("user:", user);
-  // const toast = useToast();
+  const toast = useToast();
   const [profilePic, setProfilePic] = useState("");
   const [name, setName] = useState(user.email);
   const navigate = useNavigate();
 
   let token = localStorage.getItem("todoistAuthToken") || "";
-  // if (token) {
-  //   console.log("user has token");
-  // } else {
-  //   console.log("user has no token");
-  // }
 
   const handleUpdateProfile = async () => {
     setIsLoading(true);
@@ -54,10 +53,45 @@ function CreateProfile() {
         navigate("/onboard/use-case");
       }
     } catch (error) {
+      console.error("Failed to update user:", error);
+    } finally {
       setIsLoading(false);
-      console.log(error);
     }
   };
+  // Function to handle image upload
+  const handleImageUpload = async (file) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "my_unsigned_preset"); // replace with your actual preset
+    data.append("cloud_name", "your_cloud_name"); // replace with your cloud name
+
+    setImageUploading(true);
+    try {
+      const res = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`,
+        data
+      );
+
+      console.log("Uploaded Image URL:", res.data.secure_url);
+      setProfilePic(res.data.secure_url);
+      // Optionally, you can also update the user profile with the new image URL
+      // dispatch(updateUser({ ...user, profilePic: res.data.secure_url }));
+      toast({
+        title: "Image uploaded successfully",
+        status: "success",
+          position: "top",
+        duration: 3000,
+      });
+
+    } catch (error) {
+      console.error("Image upload failed:", error);
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
+
+
 
   if (isLoading)
     return (
@@ -84,7 +118,7 @@ function CreateProfile() {
         direction={{ base: "column", lg: "row" }}
         alignItems={{ lg: "center" }}
         justify={"space-between"}
-        // justify={{ base: "flex-end", lg: "space-between" }}
+      // justify={{ base: "flex-end", lg: "space-between" }}
       >
         <Box w={{ base: "100%", lg: "45%" }} mb={{ base: 8, lg: 0 }}>
           {/* Logo */}
@@ -104,18 +138,30 @@ function CreateProfile() {
 
           {/* Buttons and Form */}
           <Stack direction="column" spacing={4} w="full">
-            {/* Email Input */}
+            {profilePic && (
+              <Image src={profilePic} alt="Preview" boxSize="100px" objectFit="cover" mt={2} />
+            )}
             <FormControl p={2} borderRadius={"md"} border={"1px solid #f1f1f1"}>
               <Input
                 id="email"
                 type="file"
                 name="email"
-                onChange={(e) => setProfilePic(e.target.value)}
+                accept="image/*"
+                // onChange={(e) => setProfilePic(e.target.value)}
+                onChange={(e) => handleImageUpload(e.target.files[0])}
                 border={"none"}
                 placeholder="Enter your email"
                 _focus={{ borderColor: "gray.400", boxShadow: "outline" }}
               />
             </FormControl>
+
+            {/* Uploading Image Indicator */}
+            {imageUploading && (
+              <Flex align="center" gap={2}>
+                <ButtonSpinner size="sm" color="red.400" />
+                <Text fontSize="sm">Uploading image...</Text>
+              </Flex>
+            )}
 
             {/* Name Input */}
             <FormControl p={2} borderRadius={"md"} border={"1px solid #f1f1f1"}>
@@ -137,16 +183,18 @@ function CreateProfile() {
 
             {/* Log In Button */}
             <Button
-              bg={"#e74c3c"}
-              color={"#fff"}
-              fontSize={"lg"}
+              isDisabled={!profilePic || imageUploading}
+              bg="#e74c3c"
+              color="#fff"
+              fontSize="lg"
               w="full"
               _hover={{ bg: "#db4c3e" }}
               aria-label="Log in"
               onClick={handleUpdateProfile}
             >
-              Continue
+              {imageUploading ? "Uploading..." : "Continue"}
             </Button>
+
           </Stack>
         </Box>
 

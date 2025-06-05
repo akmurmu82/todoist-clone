@@ -21,10 +21,13 @@ import { useState } from "react";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../../redux/slices/userSlice";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 function LoginPage() {
+  const { user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [isPasswordHidden, setIspasswordHidden] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const [email, setEmail] = useState("");
@@ -62,14 +65,15 @@ function LoginPage() {
         email,
         password,
       });
+
       if (res.data.status) {
-        setIsLoading(false);
+        console.log(res.data)
+        dispatch(updateUser(res.data.user));
         const token = res.data.token;
         localStorage.setItem("todoistAuthToken", JSON.stringify(token));
         navigate(`/home`);
       }
     } catch (error) {
-      setIsLoading(false);
       if (error.response) {
         // Display the message returned by the server, or a generic error message
         setErrorMessage(error.response.data.message || "An error occurred");
@@ -77,8 +81,10 @@ function LoginPage() {
         // Network error or no response received
         setErrorMessage("Network error. Please try again.");
       }
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }
 
   return (
     <Box
@@ -278,6 +284,7 @@ function LoginPage() {
       </Flex>
     </Box>
   );
+
 }
 
 export default LoginPage;

@@ -3,14 +3,14 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   todos: [
     // The todo schema could include fields like:
-    {
-      _id: "", // Todo ID
-      title: "", // Title of the task
-      description: "", // Task description
-      dueDate: "", // Date when the task is due
-      priority: "", // Task priority (e.g., low, medium, high)
-      completed: false, // Boolean to track if the task is completed
-    },
+    // {
+    //   _id: "", // Todo ID
+    //   title: "", // Title of the task
+    //   description: "", // Task description
+    //   dueDate: "", // Date when the task is due
+    //   priority: "", // Task priority (e.g., low, medium, high)
+    //   completed: false, // Boolean to track if the task is completed
+    // },
   ],
 };
 
