@@ -73,9 +73,6 @@ export default function TaskItem({
     <Box
       borderBottomWidth={1}
       borderRadius={"md"}
-      py={2}
-      // color="#f3f3f3"
-      // bg={'linear-gradient(to right, #db4c3e 0%, #f19696 100%)'}
       px={2}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}

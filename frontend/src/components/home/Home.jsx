@@ -1,4 +1,4 @@
-import { Box, HStack, Text, useDisclosure, Heading } from "@chakra-ui/react";
+import { Box, HStack, Text, useDisclosure, Heading, Flex, ButtonSpinner } from "@chakra-ui/react";
 import { FaPlusCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
 
@@ -8,6 +8,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { loadTodo } from "../../redux/slices/todoSlice";
 import AddTodoModal from "./AddTodoModal";
+import TodoItemSkeleton from "./TodoItemSkeleton";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 const Home = () => {
@@ -15,6 +16,7 @@ const Home = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { todos } = useSelector((state) => state.todos);
+  const [isTodosLoading, setIsTodosLoading] = useState(false)
   const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
   const [currTodoId, setCurrTodoId] = useState(null);
 
@@ -37,6 +39,7 @@ const Home = () => {
   // Fetching Todos
   const fetchTodos = async () => {
     try {
+      setIsTodosLoading(true)
       let res = await axios.get(`${BaseBackendURL}/todos`, {
         body: { _id: user._id },
 
@@ -51,6 +54,8 @@ const Home = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsTodosLoading(false)
     }
   };
 
@@ -74,10 +79,25 @@ const Home = () => {
       >
         <Heading>Inbox</Heading>
 
-        {/* Listing Todos */}
-        {todos.length == 0 ? (
-          <h1>No todos to show</h1>
-        ) : (
+        {/* Loading Indicator */}
+        {/* Skeletons while loading */}
+        {isTodosLoading && (
+          <>
+            {[...Array(3)].map((_, idx) => (
+              <TodoItemSkeleton key={idx} />
+            ))}
+          </>
+        )}
+
+        {/* If no todos */}
+        {!isTodosLoading && todos.length === 0 && (
+          <Text fontSize="md" color="gray.600" textAlign="center">
+            No todos to show.
+          </Text>
+        )}
+
+        {/* Todos List */}
+        {!isTodosLoading &&
           todos.map(({ _id, title, description, isCompleted, priority }) => (
             <TaskItem
               key={_id}
@@ -88,8 +108,7 @@ const Home = () => {
               priority={priority}
               toggleOnModalOpen={toggleOnModalOpen}
             />
-          ))
-        )}
+          ))}
         {/* Add Task */}
         <HStack
           width="100%"

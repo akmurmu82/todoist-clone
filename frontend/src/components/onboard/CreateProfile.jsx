@@ -53,6 +53,7 @@ function CreateProfile() {
         navigate("/onboard/use-case");
       }
     } catch (error) {
+    
       console.error("Failed to update user:", error);
     } finally {
       setIsLoading(false);
