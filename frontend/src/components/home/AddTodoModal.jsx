@@ -129,9 +129,6 @@ function AddTodoModal({
   // Adding Todos
   const handleAddTodo = async () => {
     try {
-      setDueDate("");
-      setTitle("");
-      setDescription("");
       setIsLoading(true);
       let res = await axios.post(
         `${BaseBackendURL}/todos/add`,
@@ -151,13 +148,17 @@ function AddTodoModal({
       );
       // console.log(res);
       if (res.data.status) {
-        setIsLoading(false);
         dispatch(addTodo(res.data.data));
         onModalClose();
       }
     } catch (error) {
-      setIsLoading(false);
       console.log(error);
+    } finally {
+      setIsLoading(false);
+      setDueDate("");
+      setTitle("");
+      setDescription("");
+      setPriority(null);
     }
   };
 

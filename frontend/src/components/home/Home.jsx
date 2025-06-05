@@ -16,6 +16,7 @@ const Home = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { todos } = useSelector((state) => state.todos);
+  console.log("todos:", todos);
   const [isTodosLoading, setIsTodosLoading] = useState(false)
   const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
   const [currTodoId, setCurrTodoId] = useState(null);
