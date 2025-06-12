@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Box,
@@ -16,6 +15,7 @@ import {
   Button,
   Divider,
   Tooltip,
+  useToast,
 } from "@chakra-ui/react";
 import {
   FaRegCalendar,
@@ -36,6 +36,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { deleteTodo } from "../../redux/slices/todoSlice";
+import { isToday, isTomorrow, format, parse } from "date-fns";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 const token = JSON.parse(localStorage.getItem("todoistAuthToken"));
 
@@ -43,12 +44,29 @@ export default function TaskItem({
   title = "Sample Task",
   todoId,
   description = "This is a sample task description",
+  dueDate,
   isCompleted = false,
   // priority = "medium",
   toggleOnModalOpen,
 }) {
   const dispatch = useDispatch();
+  const toast = useToast();
   const [isHovering, setIsHovering] = useState(false);
+
+  // Check if the due date is today or tomorrow
+  // Convert dueDate string (like "07/06/2025") to a Date object
+  // const parsedDueDate = new Date(dueDate);
+const parsedDueDate = parse(dueDate, "dd/MM/yyyy", new Date());
+  console.log(dueDate, parsedDueDate);
+  const isDueToday = isToday(parsedDueDate);
+  const isDueTomorrow = isTomorrow(parsedDueDate);
+  const formattedDate = isDueToday
+    ? "Today"
+    : isDueTomorrow
+      ? "Tomorrow"
+      : format(parsedDueDate, "dd/MM/yyyy");
+  console.log(formattedDate);
+  // Format logic
 
   // Delete Todo
   const handleDeleteTodo = async () => {
@@ -61,7 +79,13 @@ export default function TaskItem({
         },
       });
       if (res.status) {
-        console.log(res);
+        // console.log(res);
+        toast({
+          title: "Todo deleted successfully",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
         dispatch(deleteTodo(todoId));
       }
     } catch (error) {
@@ -93,7 +117,7 @@ export default function TaskItem({
           <HStack>
             <Icon as={FaRegCalendar} color="orange.500" boxSize={3} />
             <Text fontSize="xs" color="orange.500">
-              Tomorrow
+              {formattedDate}
             </Text>
           </HStack>
         </VStack>
@@ -292,6 +316,7 @@ function Option({ icon, text, shortcut, rightIcon, isDelete, handleClick }) {
 TaskItem.propTypes = {
   todoId: PropTypes.string,
   title: PropTypes.string,
+  dueDate: PropTypes.string,
   description: PropTypes.string,
   priority: PropTypes.string,
   isCompleted: PropTypes.bool,

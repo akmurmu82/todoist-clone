@@ -19,7 +19,7 @@ import ProfilePopover from "./ProfilePopover";
 
 const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose }) => {
   const { user } = useSelector((state) => state.user);
-  console.log("user:", user)
+  // console.log("user:", user)
   return (
     <>
       {/* Mobile View */}

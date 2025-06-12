@@ -1,9 +1,8 @@
 import { Box, HStack, Text, useDisclosure, Heading, Flex, ButtonSpinner } from "@chakra-ui/react";
 import { FaPlusCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
-
 import Sidebar from "../sidebar/Sidebar";
-import TaskItem from "./Task";
+import TaskItem from "./TaskItem";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { loadTodo } from "../../redux/slices/todoSlice";
@@ -16,7 +15,7 @@ const Home = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { todos } = useSelector((state) => state.todos);
-  console.log("todos:", todos);
+  // console.log("todos:", todos);
   const [isTodosLoading, setIsTodosLoading] = useState(false)
   const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
   const [currTodoId, setCurrTodoId] = useState(null);
@@ -27,6 +26,9 @@ const Home = () => {
     onClose: onModalClose,
   } = useDisclosure();
 
+  // Function to handle opening the modal with the current todo ID
+  // If todoId is null, it means we are adding a new todo
+  // If todoId is a string, it means we are editing an existing todo
   function toggleOnModalOpen(todoId) {
     if (typeof todoId === "string") {
       setCurrTodoId(todoId);
@@ -99,15 +101,16 @@ const Home = () => {
 
         {/* Todos List */}
         {!isTodosLoading &&
-          todos.map(({ _id, title, description, isCompleted, priority }) => (
+          todos.map(({ _id, title, description, dueDate, isCompleted, priority }) => (
             <TaskItem
               key={_id}
               todoId={_id}
               title={title}
               description={description}
+              dueDate={dueDate}
               isCompleted={isCompleted}
               priority={priority}
-              toggleOnModalOpen={toggleOnModalOpen}
+              toggleOnModalOpen={toggleOnModalOpen} // Function to open modal with todoId
             />
           ))}
         {/* Add Task */}

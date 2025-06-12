@@ -51,8 +51,9 @@ function AddTodoModal({
   const [title, setTitle] = useState(currTodoId ? currTodo.title : "");
   const [dueDate, setDueDate] = useState(currTodoId ? currTodo.dueDate : "");
   const [description, setDescription] = useState(
-    currTodoId ? currTodo.description : ""
+    currTodoId ? currTodo.description : "None"
   );
+  // console.log(currTodoId, title, dueDate, description);
 
   useEffect(() => {
     if (currTodo) {
@@ -130,15 +131,22 @@ function AddTodoModal({
   const handleAddTodo = async () => {
     try {
       setIsLoading(true);
+
+      const payload = {
+        title,
+        dueDate: dueDate.toLocaleDateString(),
+        userId: user._id,
+        priority: formatPriority(priority),
+      };
+
+      // Only include description if it's not empty
+      if (description.trim() !== "") {
+        payload.description = description;
+      }
+
       let res = await axios.post(
         `${BaseBackendURL}/todos/add`,
-        {
-          title,
-          description,
-          dueDate: dueDate.toLocaleDateString(),
-          userId: user._id,
-          priority: formatPriority(priority),
-        },
+        payload,
         {
           headers: {
             authorization: `Bearer ${token}`,
@@ -170,7 +178,6 @@ function AddTodoModal({
         `${BaseBackendURL}/todos/update/${currTodoId}`,
         {
           title,
-          description,
           dueDate:
             typeof dueDate !== "string"
               ? dueDate.toLocaleDateString()
