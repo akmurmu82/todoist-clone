@@ -14,14 +14,21 @@ const auth = async (req, res, next) => {
     }
 
     const token = authHeaders.split(" ")[1];
+    // console.log("Auth Header:", authHeaders);
+    // console.log("Token:", token);
+
     if (!token) {
-      res.status(401).json({ message: "Token not provided." });
+      return res.status(401).json({ message: "Token not provided." });
     }
 
     const decoded = jwt.verify(token, jwtSecret);
-    // Attach decoded information to the request body
-    req.body.userId = decoded.userId;
-    req.body.name = decoded.name;
+
+    // ✅ Attach user info to req.user
+    req.user = {
+      userId: decoded.userId,
+      name: decoded.name,
+      role: decoded.role || "user",
+    };
 
     next();
   } catch (error) {
@@ -30,7 +37,7 @@ const auth = async (req, res, next) => {
     } else if (error.name === "JsonWebTokenError") {
       return res.status(401).json({ message: "Invalid token" });
     } else {
-      return res.status(500).json({ message: error });
+      return res.status(500).json({ message: error.message });
     }
   }
 };

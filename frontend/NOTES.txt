@@ -1,6 +1,6 @@
 ##Feature:
 
-1. If the has already logged in, just redirect they to home page.
+1. If the has already logged in, just redirect them to home page.
 
 ##Bugs:
 
@@ -15,3 +15,5 @@
 4. User already exist (while signup)
 
 5. Responsive Landing Page
+
+==== NEW ===

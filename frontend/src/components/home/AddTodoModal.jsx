@@ -32,73 +32,58 @@ import {
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { addTodo, updateTodo } from "../../redux/slices/todoSlice";
+import { createTodoAsync, updateTodoAsync } from "../../redux/slices/todoSlice";
 
-const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
-
-function AddTodoModal({
-  currTodoId,
-  setCurrTodoId,
-  isModalOpen,
-  onModalClose,
-}) {
+function AddTodoModal({ currTodoId, setCurrTodoId, isModalOpen, onModalClose }) {
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const { todos } = useSelector((state) => state.todos);
-  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const [currTodo] = todos.filter((todo) => todo._id === currTodoId);
-  const [title, setTitle] = useState(currTodoId ? currTodo.title : "");
-  const [dueDate, setDueDate] = useState(currTodoId ? currTodo.dueDate : "");
-  const [description, setDescription] = useState(
-    currTodoId ? currTodo.description : "None"
-  );
-  // console.log(currTodoId, title, dueDate, description);
 
+  const currTodo =
+    Array.isArray(todos) && currTodoId
+      ? todos.find((todo) => todo._id === currTodoId)
+      : null;
+
+  const [title, setTitle] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState(null);
+
+  // When modal opens or currTodo changes, update form fields
   useEffect(() => {
     if (currTodo) {
       setTitle(currTodo.title || "");
       setDueDate(currTodo.dueDate || "");
       setDescription(currTodo.description || "");
+      setPriority(
+        currTodo.priority === "high"
+          ? 1
+          : currTodo.priority === "medium"
+            ? 2
+            : 3
+      );
     } else {
-      // If there's no currTodo, reset to default controlled values
       setTitle("");
       setDueDate("");
       setDescription("");
-      setCurrTodoId(null);
+      setPriority(null);
     }
   }, [currTodoId, currTodo]);
 
-  // Inside your component
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-
-  const [priority, setPriority] = useState(null);
-  const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
-
-  // formatting the priority before sending the request
-  const formatPriority = (priority) => {
-    let formattedPriority = "";
-    if (priority == 1) {
-      formattedPriority = "high";
-    } else if (priority == 2) {
-      formattedPriority = "medium";
-    } else if (priority == 3) {
-      formattedPriority = "low";
-    } else {
-      formattedPriority = "low"; // setting default priority is "low"
+  const formatPriority = (level) => {
+    switch (level) {
+      case 1:
+        return "high";
+      case 2:
+        return "medium";
+      case 3:
+        return "low";
+      default:
+        return "low";
     }
-    return formattedPriority;
   };
 
-  // priorities
-  const priorityOptions = [
-    { level: 1, color: "red.500", label: "High" },
-    { level: 2, color: "orange.500", label: "Medium" },
-    { level: 3, color: "blue.500", label: "Low" },
-  ];
-
-  // Data
   const quickDateOptions = [
     { label: "Today", value: new Date() },
     {
@@ -108,9 +93,7 @@ function AddTodoModal({
     {
       label: "Next weekend",
       value: new Date(
-        new Date().setDate(
-          new Date().getDate() + ((6 - new Date().getDay() + 7) % 7)
-        )
+        new Date().setDate(new Date().getDate() + ((6 - new Date().getDay() + 7) % 7))
       ),
     },
     {
@@ -119,93 +102,48 @@ function AddTodoModal({
     },
   ];
 
-  const handleQuickDateSelect = (date) => {
-    setDueDate(date);
-  };
+  const priorityOptions = [
+    { level: 1, color: "red.500", label: "High" },
+    { level: 2, color: "orange.500", label: "Medium" },
+    { level: 3, color: "blue.500", label: "Low" },
+  ];
 
-  const handleCalendarSelect = (date) => {
-    setDueDate(date);
-  };
+  const handleSubmit = async () => {
+    if (!title || !dueDate || !user?._id) return;
 
-  // Adding Todos
-  const handleAddTodo = async () => {
+    const payload = {
+      title,
+      dueDate:
+        typeof dueDate !== "string"
+          ? dueDate.toLocaleDateString()
+          : dueDate,
+      userId: user._id,
+      priority: formatPriority(priority),
+      ...(description?.trim() && { description }),
+    };
+
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
-
-      const payload = {
-        title,
-        dueDate: dueDate.toLocaleDateString(),
-        userId: user._id,
-        priority: formatPriority(priority),
-      };
-
-      // Only include description if it's not empty
-      if (description.trim() !== "") {
-        payload.description = description;
+      if (currTodoId) {
+        await dispatch(updateTodoAsync({ todoId: currTodoId, updatedData: payload })).unwrap();
+      } else {
+        await dispatch(createTodoAsync(payload)).unwrap();
       }
 
-      let res = await axios.post(
-        `${BaseBackendURL}/todos/add`,
-        payload,
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      // console.log(res);
-      if (res.data.status) {
-        dispatch(addTodo(res.data.data));
-        onModalClose();
-      }
+      onModalClose();
+      setCurrTodoId(null);
     } catch (error) {
-      console.log(error);
+      console.error("Error saving todo:", error);
     } finally {
       setIsLoading(false);
-      setDueDate("");
       setTitle("");
+      setDueDate("");
       setDescription("");
       setPriority(null);
     }
   };
 
-  // Update Todos
-  const handleUpdateTodo = async () => {
-    setIsLoading(true);
-    try {
-      let res = await axios.patch(
-        `${BaseBackendURL}/todos/update/${currTodoId}`,
-        {
-          title,
-          dueDate:
-            typeof dueDate !== "string"
-              ? dueDate.toLocaleDateString()
-              : dueDate,
-          userId: user._id,
-          priority: formatPriority(priority),
-        },
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      // console.log(res);
-      if (res.data.status) {
-        setIsLoading(false);
-        dispatch(updateTodo({ currTodoId, newTodo: res.data.data }));
-        onModalClose();
-        setDueDate("");
-        setTitle("");
-        setDescription("");
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
 
   return (
     <Modal isOpen={isModalOpen} onClose={onModalClose} isCentered size="lg">
@@ -215,7 +153,6 @@ function AddTodoModal({
           <Input
             variant="unstyled"
             p={0}
-            m={0}
             fontSize="lg"
             placeholder="Task name"
             mb={4}
@@ -225,7 +162,6 @@ function AddTodoModal({
           <Input
             variant="unstyled"
             p={0}
-            m={0}
             fontSize="sm"
             placeholder="Description"
             mb={4}
@@ -233,9 +169,7 @@ function AddTodoModal({
             onChange={(e) => setDescription(e.target.value)}
           />
 
-          {/* Task options */}
           <HStack spacing={4} mb={4} color="gray">
-            {/* Due Date button */}
             <Popover placement="bottom-start">
               <PopoverTrigger>
                 <Button
@@ -254,15 +188,12 @@ function AddTodoModal({
               <PopoverContent width="300px">
                 <PopoverBody>
                   <VStack align="stretch" spacing={2}>
-                    <Input placeholder="Type a due date" size="sm" mb={2} />
-
-                    {/* Quick Date option */}
                     {quickDateOptions.map((option) => (
                       <Button
                         key={option.label}
                         variant="ghost"
                         justifyContent="space-between"
-                        onClick={() => handleQuickDateSelect(option.value)}
+                        onClick={() => setDueDate(option.value)}
                       >
                         <Text>{option.label}</Text>
                         <Text fontSize="xs" color="gray.500">
@@ -272,12 +203,10 @@ function AddTodoModal({
                         </Text>
                       </Button>
                     ))}
-
-                    {/* Calender */}
                     <Calendar
                       mode="single"
                       selected={dueDate}
-                      onSelect={handleCalendarSelect}
+                      onSelect={setDueDate}
                       initialFocus
                     />
                     <Button
@@ -292,7 +221,6 @@ function AddTodoModal({
               </PopoverContent>
             </Popover>
 
-            {/* Priority */}
             <Menu>
               <MenuButton
                 as={Button}
@@ -304,14 +232,12 @@ function AddTodoModal({
                   <Icon
                     as={FaFlag}
                     color={
-                      priority
-                        ? priorityOptions[priority - 1].color
-                        : "gray.500"
+                      priority ? priorityOptions[priority - 1].color : "gray.500"
                     }
                   />
                   <Text>
                     {priority
-                      ? `${priorityOptions[priority - 1].label}`
+                      ? priorityOptions[priority - 1].label
                       : "Priority"}
                   </Text>
                 </HStack>
@@ -341,10 +267,7 @@ function AddTodoModal({
           </HStack>
         </ModalBody>
         <ModalFooter justifyContent="space-between" pt={4}>
-          {/* Toggle Dropdown */}
-          <Button leftIcon={<FaInbox />} onClick={toggleDropdown}>
-            Inbox
-          </Button>
+          <Button leftIcon={<FaInbox />}>Inbox</Button>
 
           <HStack>
             <Button variant="ghost" onClick={onModalClose}>
@@ -353,13 +276,7 @@ function AddTodoModal({
             <Button
               colorScheme="red"
               ml={3}
-              onClick={() => {
-                if (currTodoId) {
-                  handleUpdateTodo();
-                } else {
-                  handleAddTodo();
-                }
-              }}
+              onClick={handleSubmit}
               isDisabled={!title || !dueDate}
             >
               {isLoading ? (

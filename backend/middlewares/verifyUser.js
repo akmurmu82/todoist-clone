@@ -1,28 +1,24 @@
 const TodoModel = require("../models/todoModel");
-
 require("dotenv").config();
-
-const jwtSecret = process.env.JWT_SECRET;
 
 const verifyUser = async (req, res, next) => {
   const { todoId } = req.params;
-  const { userId } = req.body;
-  try {
-    // if (!todoId) {
-    //   res.status(500).json({ status: false, message: "Todo ID is required" });
-    // }
-    const todo = await TodoModel.findOne(
-      { _id: todoId },
-      { userId: 1, title: 1 }
-    );
+  const { userId, role } = req.user;
 
-    if (todo.userId.toString() === userId) {
+  try {
+    const todo = await TodoModel.findById(todoId).select("userId title");
+
+    if (!todo) {
+      return res.status(404).json({ message: "Todo not found" });
+    }
+
+    if (todo.userId.toString() === userId || role === "admin") {
       return next();
     }
-    
-    res.status(403).json({ status: false, message: "Unauthorized" });
+
+    return res.status(403).json({ status: false, message: "Unauthorized" });
   } catch (error) {
-    res.status(500).json({ status: false, message: "Error fetching todos" });
+    return res.status(500).json({ status: false, message: "Error verifying user" });
   }
 };
 

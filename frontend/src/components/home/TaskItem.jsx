@@ -35,29 +35,30 @@ import { RxValueNone } from "react-icons/rx";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { deleteTodo } from "../../redux/slices/todoSlice";
+import { deleteTodo, deleteTodoAsync, updateTodo, updateTodoAsync } from "../../redux/slices/todoSlice";
 import { isToday, isTomorrow, format, parse } from "date-fns";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 const token = JSON.parse(localStorage.getItem("todoistAuthToken"));
 
 export default function TaskItem({
-  title = "Sample Task",
-  todoId,
-  description = "This is a sample task description",
-  dueDate,
-  isCompleted = false,
-  // priority = "medium",
+  todo,
   toggleOnModalOpen,
 }) {
+  const {
+    title = "Sample Task",
+    _id,
+    description = "This is a sample task description",
+    dueDate,
+    isCompleted = false,
+    priority = "medium",
+  } = todo;
   const dispatch = useDispatch();
   const toast = useToast();
   const [isHovering, setIsHovering] = useState(false);
+  const [checked, setChecked] = useState(isCompleted);
 
   // Check if the due date is today or tomorrow
-  // Convert dueDate string (like "07/06/2025") to a Date object
-  // const parsedDueDate = new Date(dueDate);
-const parsedDueDate = parse(dueDate, "dd/MM/yyyy", new Date());
-  console.log(dueDate, parsedDueDate);
+  const parsedDueDate = dueDate ? parse(dueDate, "dd/MM/yyyy", new Date()) : new Date();
   const isDueToday = isToday(parsedDueDate);
   const isDueTomorrow = isTomorrow(parsedDueDate);
   const formattedDate = isDueToday
@@ -65,33 +66,66 @@ const parsedDueDate = parse(dueDate, "dd/MM/yyyy", new Date());
     : isDueTomorrow
       ? "Tomorrow"
       : format(parsedDueDate, "dd/MM/yyyy");
-  console.log(formattedDate);
-  // Format logic
+
+  // Handle update Todo: title, description, priority, isCompleted
+  const handleUpdate = async (updatedFields) => {
+    try {
+      // Dispatch the thunk with _id and updated fields
+      const res = await dispatch(updateTodoAsync({ _id, ...updatedFields }));
+      console.log(updatedFields);
+
+      if (res.type.endsWith("fulfilled")) {
+        // Optionally update local state like checkbox
+        if ("isCompleted" in updatedFields) {
+          setChecked(updatedFields.isCompleted);
+        }
+        console.log(res)
+        toast({
+          title: "Todo updated.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
+        throw new Error("Update failed");
+      }
+    } catch (err) {
+      console.error("Error updating todo:", err);
+      toast({
+        title: "Failed to update todo.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  };
 
   // Delete Todo
   const handleDeleteTodo = async () => {
-    console.log(token);
     try {
-      let res = await axios.delete(`${BaseBackendURL}/todos/delete/${todoId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (res.status) {
-        // console.log(res);
+      const resultAction = await dispatch(deleteTodoAsync(_id));
+      if (deleteTodoAsync.fulfilled.match(resultAction)) {
         toast({
           title: "Todo deleted successfully",
           status: "success",
           duration: 2000,
           isClosable: true,
         });
-        dispatch(deleteTodo(todoId));
+      } else {
+        throw new Error(resultAction.payload || "Failed to delete todo");
       }
     } catch (error) {
       console.log(error);
+      toast({
+        title: "Error deleting todo",
+        description: error.message || "Something went wrong",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
+
 
   return (
     <Box
@@ -104,10 +138,11 @@ const parsedDueDate = parse(dueDate, "dd/MM/yyyy", new Date());
       <Flex align="start">
         <Checkbox
           size="lg"
-          colorScheme="green"
+          colorScheme={priority === "high" ? "red" : priority === "medium" ? "blue" : "white"}
           mr={3}
           mt={1}
-          isChecked={isCompleted}
+          isChecked={checked}
+          onChange={() => handleUpdate({ isCompleted: !checked })}
         />
         <VStack align="start" spacing={1} flex={1}>
           <Text fontWeight="medium">{title}</Text>
@@ -128,7 +163,7 @@ const parsedDueDate = parse(dueDate, "dd/MM/yyyy", new Date());
               icon={<FaPencilAlt />}
               size="sm"
               variant="ghost"
-              onClick={() => toggleOnModalOpen(todoId)}
+              onClick={() => toggleOnModalOpen(_id)}
             />
             <IconButton
               aria-label="Comment on task"
@@ -314,7 +349,7 @@ function Option({ icon, text, shortcut, rightIcon, isDelete, handleClick }) {
 
 // Prop Validation
 TaskItem.propTypes = {
-  todoId: PropTypes.string,
+  _id: PropTypes.string,
   title: PropTypes.string,
   dueDate: PropTypes.string,
   description: PropTypes.string,

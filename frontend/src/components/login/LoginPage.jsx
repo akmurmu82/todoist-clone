@@ -19,72 +19,41 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser } from "../../redux/slices/userSlice";
-const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
+import { loginUserAsync } from "../../redux/slices/userSlice";
 
 function LoginPage() {
-  const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const [isPasswordHidden, setIspasswordHidden] = useState(true);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const navigate = useNavigate();
+
+  const { loading, error } = useSelector((state) => state.user);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordHidden, setIspasswordHidden] = useState(true);
   const [isEmailInvalid, setIsEmailInvalid] = useState(false);
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleTogglePassword = () => {
     setIspasswordHidden(!isPasswordHidden);
   };
 
-  const handleLogin = async () => {
-    if (!email) {
-      setIsEmailInvalid(true);
-    } else {
-      setIsEmailInvalid(false);
-    }
+  const handleLogin = () => {
+    setIsEmailInvalid(!email);
+    setIsPasswordInvalid(!password);
 
-    if (!password) {
-      setIsPasswordInvalid(true);
-    } else {
-      setIsPasswordInvalid(false);
-    }
+    if (!email || !password) return;
 
-    if (!email || !password) {
-      setErrorMessage("Both email and password are required.");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const res = await axios.post(`${BaseBackendURL}/users/login`, {
-        email,
-        password,
+    dispatch(loginUserAsync({ email, password }))
+      .unwrap()
+      .then(() => {
+        navigate("/home");
+      })
+      .catch(() => {
+        // Errors already handled in Redux state
       });
-
-      if (res.data.status) {
-        console.log(res.data)
-        dispatch(updateUser(res.data.user));
-        const token = res.data.token;
-        localStorage.setItem("todoistAuthToken", JSON.stringify(token));
-        navigate(`/home`);
-      }
-    } catch (error) {
-      if (error.response) {
-        // Display the message returned by the server, or a generic error message
-        setErrorMessage(error.response.data.message || "An error occurred");
-      } else {
-        // Network error or no response received
-        setErrorMessage("Network error. Please try again.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  };
 
   return (
     <Box
@@ -99,12 +68,10 @@ function LoginPage() {
         justify={"space-between"}
       >
         <Box w={{ base: "100%", lg: "45%" }} mb={{ base: 8, lg: 0 }}>
-          {/* Logo */}
           <Text fontSize="2xl" fontWeight="bold" color="red.500" mr={8}>
             todoist
           </Text>
 
-          {/* Heading */}
           <Text
             as={"h1"}
             py={{ base: 6, lg: 10 }}
@@ -114,9 +81,7 @@ function LoginPage() {
             Log in
           </Text>
 
-          {/* Buttons and Form */}
           <Stack direction="column" spacing={4} w="full">
-            {/* Social Logins */}
             <Button
               variant="outline"
               fontSize={"lg"}
@@ -147,7 +112,6 @@ function LoginPage() {
               Continue with Apple
             </Button>
 
-            {/* Email Input */}
             <FormControl isInvalid={isEmailInvalid}>
               <FormLabel htmlFor="email" mb={1} fontSize="sm">
                 Email
@@ -158,7 +122,7 @@ function LoginPage() {
                 name="email"
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  setErrorMessage(null); // Reset error message when input changes
+                  setIsEmailInvalid(false);
                 }}
                 placeholder="Enter your email"
                 _focus={{ borderColor: "gray.400", boxShadow: "outline" }}
@@ -168,7 +132,6 @@ function LoginPage() {
               )}
             </FormControl>
 
-            {/* Password Input */}
             <FormControl isInvalid={isPasswordInvalid}>
               <FormLabel htmlFor="password" mb={1} fontSize="sm">
                 Password
@@ -180,7 +143,7 @@ function LoginPage() {
                   name="password"
                   onChange={(e) => {
                     setPassword(e.target.value);
-                    setErrorMessage(null); // Reset error message when input changes
+                    setIsPasswordInvalid(false);
                   }}
                   placeholder="Enter your password"
                   _focus={{ borderColor: "gray.400", boxShadow: "outline" }}
@@ -201,27 +164,24 @@ function LoginPage() {
               )}
             </FormControl>
 
-            {/* Error Message */}
-            {errorMessage && (
+            {error && (
               <Text color="red.500" fontSize="sm">
-                {errorMessage}
+                {error}
               </Text>
             )}
 
-            {/* Log In Button */}
             <Button
               bg={"#e74c3c"}
               color={"#fff"}
               fontSize={"lg"}
               w="full"
               _hover={{ bg: "#db4c3e" }}
-              isDisabled={isLoading}
+              isDisabled={loading}
               onClick={handleLogin}
             >
-              {isLoading ? <Spinner /> : "Log in"}
+              {loading ? <Spinner size="sm" /> : "Log in"}
             </Button>
 
-            {/* Forgot Password Link */}
             <ChakraLink
               textDecoration="underline"
               fontSize="sm"
@@ -231,7 +191,6 @@ function LoginPage() {
               Forgot your password?
             </ChakraLink>
 
-            {/* Terms and Privacy Notice */}
             <Text fontSize="sm" color="gray.500" textAlign="center">
               By continuing with Google, Apple, or Email, you agree to
               Todoist&apos;s{" "}
@@ -257,7 +216,6 @@ function LoginPage() {
 
             <Divider />
 
-            {/* Sign Up Link */}
             <Text textAlign="center">
               Don&apos;t have an account?{" "}
               <ChakraLink
@@ -272,7 +230,7 @@ function LoginPage() {
         </Box>
 
         <Spacer />
-        {/* Image Section */}
+
         <Image
           display={{ base: "none", lg: "block" }}
           w={"50%"}
@@ -284,7 +242,6 @@ function LoginPage() {
       </Flex>
     </Box>
   );
-
 }
 
 export default LoginPage;

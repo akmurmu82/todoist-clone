@@ -1,47 +1,91 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+
+const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
+
+// ✅ Thunk for logging in the user
+export const loginUserAsync = createAsyncThunk(
+  "user/loginUser",
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(`${BaseBackendURL}/users/login`, {
+        email,
+        password,
+      });
+
+      // Save token to localStorage
+      localStorage.setItem("todoistAuthToken", JSON.stringify(res.data.token));
+
+      return res.data.user;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Login failed. Try again."
+      );
+    }
+  }
+);
 
 const initialState = {
-  user: {
-    _id: "", // Add _id field to match MongoDB document structure
-    name: "",
-    email: "",
-    password: "", // This will typically be omitted on the frontend for security reasons
-    profilePic: "",
-    accountType: [], // Array to hold account types
-    todos: [], // Array of todo IDs
-  },
-  isAuthenticated: false, // Authentication flag
+  user: null,
+  isAuthenticated: false,
+  loading: false,
+  error: null,
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    // Update user info
     updateUser: (state, action) => {
-      state.user = { ...state.user, ...action.payload }; // Merge updated fields with existing user data
+      state.user = { ...state.user, ...action.payload };
     },
-
-    // Set user authenticated
     setAuthenticated: (state, action) => {
-      state.isAuthenticated = action.payload; // Boolean flag for authentication
+      state.isAuthenticated = action.payload;
     },
-
-    // Add Todo to user's todos array
+    logoutUser: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+      state.loading = false;
+      state.error = null;
+      localStorage.removeItem("todoistAuthToken");
+    },
     addUserTodo: (state, action) => {
-      if (!state.user.todos.includes(action.payload)) {
-        state.user.todos.push(action.payload); // Add new todo ID if not already added
+      if (state.user && !state.user.todos.includes(action.payload)) {
+        state.user.todos.push(action.payload);
       }
     },
-
-    // Remove Todo from user's todos array
     removeUserTodo: (state, action) => {
-      state.user.todos = state.user.todos.filter(
-        (todoId) => todoId !== action.payload
-      ); // Filter out the todo by ID
+      if (state.user) {
+        state.user.todos = state.user.todos.filter(
+          (todoId) => todoId !== action.payload
+        );
+      }
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginUserAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUserAsync.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isAuthenticated = true;
+        state.loading = false;
+      })
+      .addCase(loginUserAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
-export const { updateUser, setAuthenticated, addUserTodo, removeUserTodo } = userSlice.actions;
+export const {
+  updateUser,
+  setAuthenticated,
+  logoutUser,
+  addUserTodo,
+  removeUserTodo,
+} = userSlice.actions;
+
 export default userSlice.reducer;

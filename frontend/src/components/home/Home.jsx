@@ -1,23 +1,20 @@
-import { Box, HStack, Text, useDisclosure, Heading, Flex, ButtonSpinner } from "@chakra-ui/react";
+import { Box, HStack, Text, useDisclosure, Heading } from "@chakra-ui/react";
 import { FaPlusCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import Sidebar from "../sidebar/Sidebar";
 import TaskItem from "./TaskItem";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { loadTodo } from "../../redux/slices/todoSlice";
+import { fetchTodosAsync } from "../../redux/slices/todoSlice";
 import AddTodoModal from "./AddTodoModal";
 import TodoItemSkeleton from "./TodoItemSkeleton";
-const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 const Home = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const dispatch = useDispatch();
+  const { todos, isLoading } = useSelector((state) => state.todos);
+  // console.log("Todos in Home.jsx:", todos);
+
   const { user } = useSelector((state) => state.user);
-  const { todos } = useSelector((state) => state.todos);
-  // console.log("todos:", todos);
-  const [isTodosLoading, setIsTodosLoading] = useState(false)
-  const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
   const [currTodoId, setCurrTodoId] = useState(null);
 
   const {
@@ -26,45 +23,19 @@ const Home = () => {
     onClose: onModalClose,
   } = useDisclosure();
 
-  // Function to handle opening the modal with the current todo ID
-  // If todoId is null, it means we are adding a new todo
-  // If todoId is a string, it means we are editing an existing todo
-  function toggleOnModalOpen(todoId) {
-    if (typeof todoId === "string") {
-      setCurrTodoId(todoId);
-    } else {
-      setCurrTodoId(null);
-    }
+  // Open modal for Add/Edit Todo
+  const toggleOnModalOpen = (todoId) => {
+    if (typeof todoId === "string") setCurrTodoId(todoId);
     onModalOpen();
     onClose();
-  }
-
-  // Fetching Todos
-  const fetchTodos = async () => {
-    try {
-      setIsTodosLoading(true)
-      let res = await axios.get(`${BaseBackendURL}/todos`, {
-        body: { _id: user._id },
-
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (res.data.status) {
-        // console.log(res.data.data);
-        dispatch(loadTodo(res.data.data));
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsTodosLoading(false)
-    }
   };
 
+  // Fetch todos on mount if user is logged in
   useEffect(() => {
-    fetchTodos();
-  }, []);
+    if (user?._id) {
+      dispatch(fetchTodosAsync());
+    }
+  }, [dispatch, user?._id]);
 
   return (
     <>
@@ -75,59 +46,46 @@ const Home = () => {
         onClose={onClose}
       />
 
-      {/* Main content */}
-      <Box
-        ml={{ base: "0", md: "250px" }}
-        p={{ base: "80px 50px", lg: "100px" }}
-      >
-        <Heading>Inbox</Heading>
+      <Box ml={{ base: "0", md: "250px" }} p={{ base: "80px 50px", lg: "100px" }}>
+        <Heading mb={4}>Inbox</Heading>
 
-        {/* Loading Indicator */}
-        {/* Skeletons while loading */}
-        {isTodosLoading && (
-          <>
-            {[...Array(3)].map((_, idx) => (
-              <TodoItemSkeleton key={idx} />
-            ))}
-          </>
-        )}
+        {/* Show skeletons if loading */}
+        {isLoading && [...Array(3)].map((_, idx) => <TodoItemSkeleton key={idx} />)}
 
-        {/* If no todos */}
-        {!isTodosLoading && todos.length === 0 && (
+        {/* No todos */}
+        {!isLoading && Array.isArray(todos) && todos.length === 0 && (
           <Text fontSize="md" color="gray.600" textAlign="center">
             No todos to show.
           </Text>
         )}
 
-        {/* Todos List */}
-        {!isTodosLoading &&
-          todos.map(({ _id, title, description, dueDate, isCompleted, priority }) => (
-            <TaskItem
-              key={_id}
-              todoId={_id}
-              title={title}
-              description={description}
-              dueDate={dueDate}
-              isCompleted={isCompleted}
-              priority={priority}
-              toggleOnModalOpen={toggleOnModalOpen} // Function to open modal with todoId
-            />
-          ))}
-        {/* Add Task */}
+
+        {/* Todos */}
+        {!isLoading && Array.isArray(todos) &&
+          todos
+            .filter((todo) => todo && todo._id) // skip null or invalid todos
+            .map((todo) => (
+              <TaskItem
+                key={todo._id}
+                todo={todo}
+                toggleOnModalOpen={toggleOnModalOpen}
+              />
+            ))}
+
+        {/* Add Todo Button */}
         <HStack
           width="100%"
           py={2}
           px={4}
           borderRadius="md"
           _hover={{ color: "#db4c3e", cursor: "pointer" }}
-          onClick={toggleOnModalOpen}
+          onClick={() => toggleOnModalOpen(null)}
         >
           <FaPlusCircle />
           <Text>Add Task</Text>
         </HStack>
       </Box>
 
-      {/* Add Task Modal */}
       <AddTodoModal
         currTodoId={currTodoId}
         setCurrTodoId={setCurrTodoId}

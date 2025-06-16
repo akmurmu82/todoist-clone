@@ -6,6 +6,7 @@ const jwtSecret = process.env.JWT_SECRET;
 const deleteTodos = async (req, res) => {
   try {
     const { todoId } = req.params;
+      const { userId, role } = req.user;
 
     const response = await TodoModel.findByIdAndDelete({ _id: todoId });
 
