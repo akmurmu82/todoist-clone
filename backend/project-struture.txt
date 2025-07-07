@@ -1,0 +1,23 @@
+backend/
+│
+├── config/
+│   └── db.js
+├── controllers/
+│   ├── userController.js
+│   └── todoController.js
+├── models/
+│   ├── User.js
+│   └── Todo.js
+├── routes/
+│   ├── userRoute.js
+│   └── todoRoute.js
+├── middleware/
+│   └── authMiddleware.js
+│   └── verifyUserMiddleware.js
+├── app.js
+├── index.js
+├── .env
+├── .env.example
+├── gitignore
+├── could-dos.js
+└── package.json

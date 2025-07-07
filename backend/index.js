@@ -1,37 +1,26 @@
-// import packages
-const express = require("express");
-const connection = require("./config/db");
-const cors = require("cors");
-const userRouter = require("./routes/userRoute");
-const todoRouter = require("./routes/todoRoute");
-require("dotenv").config();
-
-// Environmental variable
-const mongo_uri = process.env.MONGO_URI; // setup the mongoURI first
+const app = require('./app');
 const port = process.env.PORT || 8080;
+const connectDB = require("./config/db");
 
-// intialising server/app
-const app = express();
+if (!process.env.MONGO_URI) {
+  console.error("❌ MONGO_URI is not defined in the environment variables.");
+  process.exit(1);  // Exit if the variable is not set
+}
 
-// Middlewares
-app.use(express.json());
-app.use(cors());
+connectDB(process.env.MONGO_URI);
 
-// Routes
-app.use("/users", userRouter);
-app.use("/todos", todoRouter);
-
-// main route
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to the Server" });
+const server = app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
-// listening server
-app.listen(port, async () => {
-  try {
-    await connection(mongo_uri);
-    console.log(`listening on port ${port} and connected to db`);
-  } catch (error) {
-    console.log(error);
-  }
-});
+// Graceful shutdown (same as before)
+const shutdown = () => {
+  console.log("Received kill signal, shutting down gracefully...");
+  server.close(() => {
+    console.log("Closed out remaining connections.");
+    process.exit(0);
+  });
+};
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

@@ -1,9 +1,9 @@
 const express = require("express");
-const auth = require("../middlewares/auth");
+const auth = require("../middlewares/authMiddleware");
 const getTodos = require("../controllers/todo/getTodos");
 const addTodos = require("../controllers/todo/addTodo");
 const updateTodos = require("../controllers/todo/updateTodo");
-const verifyUser = require("../middlewares/verifyUser");
+const verifyUser = require("../middlewares/verifyUserMiddleware");
 const deleteTodos = require("../controllers/todo/deleteTodo");
 
 const todoRouter = express.Router();
