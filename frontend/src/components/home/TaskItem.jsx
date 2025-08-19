@@ -32,13 +32,11 @@ import {
 } from "react-icons/fa";
 import { RiSofaLine } from "react-icons/ri";
 import { RxValueNone } from "react-icons/rx";
+import { RxValueNone } from "react-icons/rx";
 import PropTypes from "prop-types";
-import axios from "axios";
 import { useDispatch } from "react-redux";
-import { deleteTodo, deleteTodoAsync, updateTodo, updateTodoAsync } from "../../redux/slices/todoSlice";
+import { deleteTodoAsync, updateTodoAsync } from "../../redux/slices/todoSlice";
 import { isToday, isTomorrow, format, parse } from "date-fns";
-const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
-const token = JSON.parse(localStorage.getItem("todoistAuthToken"));
 
 export default function TaskItem({
   todo,

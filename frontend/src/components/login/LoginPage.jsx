@@ -16,12 +16,16 @@ import {
   FormErrorMessage,
   Spacer,
   Spinner,
+  Badge,
+  HStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
+import { FaGoogle, FaFacebook, FaApple } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUserAsync } from "../../redux/slices/userSlice";
+import GoogleSignIn from "../auth/GoogleSignIn";
 
 function LoginPage() {
   const dispatch = useDispatch();
@@ -55,6 +59,16 @@ function LoginPage() {
       });
   };
 
+  const handleGoogleSuccess = (response) => {
+    console.log("Google Sign-In Success:", response);
+    // TODO: Send Google token to backend for verification
+    // For now, just navigate to home
+    navigate("/home");
+  };
+
+  const handleGoogleError = (error) => {
+    console.error("Google Sign-In Error:", error);
+  };
   return (
     <Box
       px={{ base: "10px", md: "40px", lg: "200px" }}
@@ -82,35 +96,62 @@ function LoginPage() {
           </Text>
 
           <Stack direction="column" spacing={4} w="full">
-            <Button
-              variant="outline"
-              fontSize={"lg"}
-              w="full"
-              aria-label="Continue with Google"
-              _hover={{ bg: "gray.100" }}
-            >
-              Continue with Google
-            </Button>
+            <GoogleSignIn 
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+            />
 
-            <Button
-              variant="outline"
-              fontSize={"lg"}
-              w="full"
-              aria-label="Continue with Facebook"
-              _hover={{ bg: "gray.100" }}
-            >
-              Continue with Facebook
-            </Button>
+            <Box position="relative">
+              <Button
+                variant="outline"
+                fontSize={"lg"}
+                w="full"
+                leftIcon={<FaFacebook />}
+                aria-label="Continue with Facebook"
+                isDisabled
+                opacity={0.6}
+                cursor="not-allowed"
+              >
+                Continue with Facebook
+              </Button>
+              <Badge
+                position="absolute"
+                top="-8px"
+                right="-8px"
+                colorScheme="orange"
+                fontSize="xs"
+                borderRadius="full"
+                px={2}
+              >
+                Coming Soon
+              </Badge>
+            </Box>
 
-            <Button
-              variant="outline"
-              fontSize={"lg"}
-              w="full"
-              aria-label="Continue with Apple"
-              _hover={{ bg: "gray.100" }}
-            >
-              Continue with Apple
-            </Button>
+            <Box position="relative">
+              <Button
+                variant="outline"
+                fontSize={"lg"}
+                w="full"
+                leftIcon={<FaApple />}
+                aria-label="Continue with Apple"
+                isDisabled
+                opacity={0.6}
+                cursor="not-allowed"
+              >
+                Continue with Apple
+              </Button>
+              <Badge
+                position="absolute"
+                top="-8px"
+                right="-8px"
+                colorScheme="orange"
+                fontSize="xs"
+                borderRadius="full"
+                px={2}
+              >
+                Coming Soon
+              </Badge>
+            </Box>
 
             <FormControl isInvalid={isEmailInvalid}>
               <FormLabel htmlFor="email" mb={1} fontSize="sm">

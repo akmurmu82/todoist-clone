@@ -9,6 +9,14 @@ import {
   Spacer,
   Icon,
   VStack,
+  IconButton,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerOverlay,
+  DrawerCloseButton,
+  useDisclosure,
+  Stack,
 } from "@chakra-ui/react";
 import {
   FaChevronDown,
@@ -18,12 +26,13 @@ import {
   FaLifeRing,
   FaLightbulb,
   FaArrowDown,
-} from "react-icons/fa"; // Import necessary icons
+  FaBars,
+} from "react-icons/fa";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
 // Reusable MenuItem component
-const MenuItem = ({ title, href, hasDropdown }) => (
+const MenuItem = ({ title, href, hasDropdown, onClick }) => (
   <Link
     href={href}
     px="2"
@@ -31,6 +40,7 @@ const MenuItem = ({ title, href, hasDropdown }) => (
     _hover={{ bg: "gray.100", borderRadius: "md" }}
     display="flex"
     alignItems="center"
+    onClick={onClick}
   >
     {title}
     {hasDropdown && <Icon as={FaChevronDown} ml={1} />}
@@ -41,10 +51,12 @@ MenuItem.propTypes = {
   title: PropTypes.string.isRequired,
   href: PropTypes.string.isRequired,
   hasDropdown: PropTypes.bool,
+  onClick: PropTypes.func,
 };
 
 function Navbar() {
   const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const menuItems = [
@@ -65,7 +77,7 @@ function Navbar() {
   ];
 
   return (
-    <Box px={8} py={4} boxShadow="sm">
+    <Box px={{ base: 4, md: 8 }} py={4} boxShadow="sm">
       <Flex alignItems="center">
         {/* Logo Section */}
         <HStack spacing={4}>
@@ -76,19 +88,18 @@ function Navbar() {
           </Box>
         </HStack>
 
-        {/* Adjust Left Alignment */}
         <Spacer />
 
-        {/* Navigation Links */}
+        {/* Desktop Navigation */}
         <HStack
           as="nav"
           spacing={8}
           fontSize="md"
           pr={2}
-          borderRight={"1px solid grey"}
+          borderRight={{ base: "none", md: "1px solid grey" }}
           fontWeight="medium"
           color="gray.700"
-          //   ml={20} // Adjust the left margin to match alignment
+          display={{ base: "none", lg: "flex" }}
         >
           {menuItems.map((item) => (
             <Box
@@ -105,10 +116,9 @@ function Navbar() {
               {item.title === "Resources" && isDropdownOpen && (
                 <VStack
                   position="absolute"
-                  top="100%" // Position just below the Resources menu
+                  top="100%"
                   bg="white"
                   w="300px"
-                  //   boxShadow="lg"
                   boxShadow="rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px"
                   borderRadius="md"
                   p={1}
@@ -135,7 +145,7 @@ function Navbar() {
                         borderRadius: "md",
                       }}
                     >
-                      <Icon as={submenu.icon} mr={2} /> {/* Add icon */}
+                      <Icon as={submenu.icon} mr={2} />
                       {submenu.title}
                     </Link>
                   ))}
@@ -145,8 +155,8 @@ function Navbar() {
           ))}
         </HStack>
 
-        {/* Buttons */}
-        <HStack spacing={6} ml={2}>
+        {/* Desktop Buttons */}
+        <HStack spacing={6} ml={2} display={{ base: "none", md: "flex" }}>
           <Link
             href="/auth/login"
             fontSize="md"
@@ -167,13 +177,64 @@ function Navbar() {
             Start for free
           </Button>
         </HStack>
+
+        {/* Mobile Menu Button */}
+        <IconButton
+          display={{ base: "flex", md: "none" }}
+          onClick={onOpen}
+          variant="ghost"
+          icon={<FaBars />}
+          aria-label="Open Menu"
+        />
+
+        {/* Mobile Drawer */}
+        <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+          <DrawerOverlay />
+          <DrawerContent>
+            <DrawerCloseButton />
+            <DrawerBody pt={16}>
+              <Stack spacing={4}>
+                {menuItems.map((item) => (
+                  <MenuItem
+                    key={item.title}
+                    title={item.title}
+                    href={item.href}
+                    hasDropdown={item.hasDropdown}
+                    onClick={onClose}
+                  />
+                ))}
+                <Box borderTop="1px solid" borderColor="gray.200" pt={4}>
+                  <Link
+                    href="/auth/login"
+                    fontSize="md"
+                    fontWeight="medium"
+                    color="gray.600"
+                    display="block"
+                    py={2}
+                    onClick={onClose}
+                  >
+                    Log in
+                  </Link>
+                  <Button
+                    colorScheme="red"
+                    size="md"
+                    width="full"
+                    mt={2}
+                    onClick={() => {
+                      navigate("/auth/signup");
+                      onClose();
+                    }}
+                  >
+                    Start for free
+                  </Button>
+                </Box>
+              </Stack>
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>
       </Flex>
     </Box>
   );
 }
-
-Navbar.propTypes = {
-  props: PropTypes.any,
-};
 
 export default Navbar;

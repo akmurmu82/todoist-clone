@@ -17,9 +17,8 @@ import { BsLayoutSidebar } from "react-icons/bs";
 import { IoNotificationsOutline } from "react-icons/io5";
 import ProfilePopover from "./ProfilePopover";
 
-const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose }) => {
+const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose, currentView, setCurrentView }) => {
   const { user } = useSelector((state) => state.user);
-  // console.log("user:", user)
   return (
     <>
       {/* Mobile View */}
@@ -90,6 +89,11 @@ const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose }) => {
               </HStack>
 
               <MenuItems toggleOnModalOpen={toggleOnModalOpen} />
+              <MenuItems 
+                toggleOnModalOpen={toggleOnModalOpen} 
+                currentView={currentView}
+                setCurrentView={setCurrentView}
+              />
             </DrawerBody>
           </Box>
         </DrawerContent>
@@ -150,7 +154,11 @@ const Sidebar = ({ toggleOnModalOpen, isOpen, onOpen, onClose }) => {
           ></ProfilePopover>
         </HStack>
 
-        <MenuItems toggleOnModalOpen={toggleOnModalOpen} />
+        <MenuItems 
+          toggleOnModalOpen={toggleOnModalOpen} 
+          currentView={currentView}
+          setCurrentView={setCurrentView}
+        />
       </Box>
     </>
   );
@@ -161,6 +169,8 @@ Sidebar.propTypes = {
   isOpen: PropTypes.bool,
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
+  currentView: PropTypes.string,
+  setCurrentView: PropTypes.func,
 };
 
 export default Sidebar;

@@ -1,5 +1,13 @@
 ## Todo API Server Documentation
 
+### Recent Updates
+- ✅ Fixed responsive navbar with mobile drawer
+- ✅ Implemented Google Sign-In placeholder (needs Google OAuth setup)
+- ✅ Added "Coming Soon" badges for Facebook and Apple sign-in
+- ✅ Implemented dynamic sidebar with search, filters, and labels
+- ✅ Added dynamic counts for Inbox, Today, and Upcoming views
+- ✅ Fixed various code issues and imports
+
 ### Overview
 This server manages users and their todos, implementing authentication using JWT. The API allows users to register, log in, and perform CRUD operations on todo items. Authorization is required for all todo-related operations.
 

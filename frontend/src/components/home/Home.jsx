@@ -12,10 +12,10 @@ const Home = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const dispatch = useDispatch();
   const { todos, isLoading } = useSelector((state) => state.todos);
-  // console.log("Todos in Home.jsx:", todos);
 
   const { user } = useSelector((state) => state.user);
   const [currTodoId, setCurrTodoId] = useState(null);
+  const [currentView, setCurrentView] = useState("Inbox");
 
   const {
     isOpen: isModalOpen,
@@ -37,6 +37,32 @@ const Home = () => {
     }
   }, [dispatch, user?._id]);
 
+  // Filter todos based on current view
+  const getFilteredTodos = () => {
+    if (!Array.isArray(todos)) return [];
+    
+    switch (currentView) {
+      case "Today":
+        const today = new Date().toLocaleDateString();
+        return todos.filter(todo => {
+          if (!todo.dueDate) return false;
+          const todoDate = new Date(todo.dueDate.split('/').reverse().join('-')).toLocaleDateString();
+          return todoDate === today && !todo.isCompleted;
+        });
+      case "Upcoming":
+        const todayDate = new Date();
+        return todos.filter(todo => {
+          if (!todo.dueDate || todo.isCompleted) return false;
+          const todoDate = new Date(todo.dueDate.split('/').reverse().join('-'));
+          return todoDate > todayDate;
+        });
+      case "Inbox":
+      default:
+        return todos.filter(todo => !todo.isCompleted);
+    }
+  };
+
+  const filteredTodos = getFilteredTodos();
   return (
     <>
       <Sidebar
@@ -44,25 +70,26 @@ const Home = () => {
         isOpen={isOpen}
         onOpen={onOpen}
         onClose={onClose}
+        currentView={currentView}
+        setCurrentView={setCurrentView}
       />
 
       <Box ml={{ base: "0", md: "250px" }} p={{ base: "80px 50px", lg: "100px" }}>
-        <Heading mb={4}>Inbox</Heading>
+        <Heading mb={4}>{currentView}</Heading>
 
         {/* Show skeletons if loading */}
         {isLoading && [...Array(3)].map((_, idx) => <TodoItemSkeleton key={idx} />)}
 
         {/* No todos */}
-        {!isLoading && Array.isArray(todos) && todos.length === 0 && (
+        {!isLoading && filteredTodos.length === 0 && (
           <Text fontSize="md" color="gray.600" textAlign="center">
-            No todos to show.
+            No todos to show in {currentView}.
           </Text>
         )}
 
 
         {/* Todos */}
-        {!isLoading && Array.isArray(todos) &&
-          todos
+        {!isLoading && filteredTodos
             .filter((todo) => todo && todo._id) // skip null or invalid todos
             .map((todo) => (
               <TaskItem

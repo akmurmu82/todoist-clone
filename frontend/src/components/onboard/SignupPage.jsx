@@ -15,14 +15,17 @@ import {
   FormErrorMessage,
   useToast,
   Spinner,
+  Badge,
 } from "@chakra-ui/react";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
+import { FaGoogle, FaFacebook, FaApple } from "react-icons/fa";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../../redux/slices/userSlice";
+import GoogleSignIn from "../auth/GoogleSignIn";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 function SignupPage() {
@@ -76,6 +79,17 @@ function SignupPage() {
     }
   };
 
+  const handleGoogleSuccess = (response) => {
+    console.log("Google Sign-In Success:", response);
+    // TODO: Send Google token to backend for verification
+    // For now, just navigate to profile creation
+    navigate("/onboard/create-profile");
+  };
+
+  const handleGoogleError = (error) => {
+    console.error("Google Sign-In Error:", error);
+  };
+
   return (
     <Box
       px={{ base: "10px", md: "40px", lg: "200px" }}
@@ -108,35 +122,63 @@ function SignupPage() {
           {/* Buttons and Form */}
           <Stack direction="column" spacing={4} w="full">
             {/* Social Logins */}
-            <Button
-              variant="outline"
-              fontSize={"lg"}
-              w="full"
-              aria-label="Continue with Google"
-              _hover={{ bg: "gray.100" }}
-            >
-              Continue with Google
-            </Button>
+            <GoogleSignIn 
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              buttonText="Sign up with Google"
+            />
 
-            <Button
-              variant="outline"
-              fontSize={"lg"}
-              w="full"
-              aria-label="Continue with Facebook"
-              _hover={{ bg: "gray.100" }}
-            >
-              Continue with Facebook
-            </Button>
+            <Box position="relative">
+              <Button
+                variant="outline"
+                fontSize={"lg"}
+                w="full"
+                leftIcon={<FaFacebook />}
+                aria-label="Continue with Facebook"
+                isDisabled
+                opacity={0.6}
+                cursor="not-allowed"
+              >
+                Continue with Facebook
+              </Button>
+              <Badge
+                position="absolute"
+                top="-8px"
+                right="-8px"
+                colorScheme="orange"
+                fontSize="xs"
+                borderRadius="full"
+                px={2}
+              >
+                Coming Soon
+              </Badge>
+            </Box>
 
-            <Button
-              variant="outline"
-              fontSize={"lg"}
-              w="full"
-              aria-label="Continue with Apple"
-              _hover={{ bg: "gray.100" }}
-            >
-              Continue with Apple
-            </Button>
+            <Box position="relative">
+              <Button
+                variant="outline"
+                fontSize={"lg"}
+                w="full"
+                leftIcon={<FaApple />}
+                aria-label="Continue with Apple"
+                isDisabled
+                opacity={0.6}
+                cursor="not-allowed"
+              >
+                Continue with Apple
+              </Button>
+              <Badge
+                position="absolute"
+                top="-8px"
+                right="-8px"
+                colorScheme="orange"
+                fontSize="xs"
+                borderRadius="full"
+                px={2}
+              >
+                Coming Soon
+              </Badge>
+            </Box>
 
             {/* Email Input */}
             <FormControl
