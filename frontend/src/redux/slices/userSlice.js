@@ -14,7 +14,7 @@ export const loginUserAsync = createAsyncThunk(
       });
 
       // Save token to localStorage
-      localStorage.setItem("todoistAuthToken", JSON.stringify(res.data.token));
+      localStorage.setItem("todoistAuthToken", res.data.token);
 
       return res.data.user;
     } catch (error) {
@@ -50,7 +50,7 @@ const userSlice = createSlice({
       localStorage.removeItem("todoistAuthToken");
     },
     addUserTodo: (state, action) => {
-      if (state.user && !state.user.todos.includes(action.payload)) {
+      if (state.user?.todos && !state.user.todos.includes(action.payload)) {
         state.user.todos.push(action.payload);
       }
     },

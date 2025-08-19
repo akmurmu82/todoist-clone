@@ -10,6 +10,7 @@ import {
   Icon,
   VStack,
   IconButton,
+<<<<<<< HEAD
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -17,6 +18,15 @@ import {
   DrawerCloseButton,
   useDisclosure,
   Stack,
+=======
+  useDisclosure,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  DrawerHeader,
+  DrawerBody,
+>>>>>>> 4fe5526 (- Made Navbar responsive)
 } from "@chakra-ui/react";
 import {
   FaChevronDown,
@@ -58,6 +68,7 @@ function Navbar() {
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const menuItems = [
     { title: "Features", href: "#", hasDropdown: false },
@@ -77,16 +88,16 @@ function Navbar() {
   ];
 
   return (
+<<<<<<< HEAD
     <Box px={{ base: 4, md: 8 }} py={4} boxShadow="sm">
+=======
+    <Box px={6} py={4} boxShadow="sm" position="sticky" top="0" bg="white" zIndex="1000">
+>>>>>>> 4fe5526 (- Made Navbar responsive)
       <Flex alignItems="center">
         {/* Logo Section */}
-        <HStack spacing={4}>
-          <Box>
-            <Text fontSize="2xl" fontWeight="bold" color="red.500" mr={8}>
-              todoist
-            </Text>
-          </Box>
-        </HStack>
+        <Text fontSize="2xl" fontWeight="bold" color="red.500">
+          todoist
+        </Text>
 
         <Spacer />
 
@@ -95,11 +106,19 @@ function Navbar() {
           as="nav"
           spacing={8}
           fontSize="md"
+<<<<<<< HEAD
           pr={2}
           borderRight={{ base: "none", md: "1px solid grey" }}
           fontWeight="medium"
           color="gray.700"
           display={{ base: "none", lg: "flex" }}
+=======
+          fontWeight="medium"
+          color="gray.700"
+          display={{ base: "none", md: "flex" }}
+          pr={2}
+          borderRight={"1px solid grey"}
+>>>>>>> 4fe5526 (- Made Navbar responsive)
         >
           {menuItems.map((item) => (
             <Box
@@ -124,10 +143,10 @@ function Navbar() {
                   p={1}
                   spacing={2}
                   alignItems="left"
-                  transition="all 0.8s ease-in-out"
+                  transition="all 0.3s ease-in-out"
                   opacity={isDropdownOpen ? 1 : 0}
                   transform={
-                    isDropdownOpen ? "translateY(0)" : "translateY(-50px)"
+                    isDropdownOpen ? "translateY(0)" : "translateY(-20px)"
                   }
                   zIndex={10}
                 >
@@ -178,6 +197,7 @@ function Navbar() {
           </Button>
         </HStack>
 
+<<<<<<< HEAD
         {/* Mobile Menu Button */}
         <IconButton
           display={{ base: "flex", md: "none" }}
@@ -232,7 +252,77 @@ function Navbar() {
             </DrawerBody>
           </DrawerContent>
         </Drawer>
+=======
+        {/* Mobile Hamburger */}
+        <IconButton
+          aria-label="Open menu"
+          icon={<FaBars />}
+          display={{ base: "flex", md: "none" }}
+          onClick={onOpen}
+          variant="ghost"
+        />
+>>>>>>> 4fe5526 (- Made Navbar responsive)
       </Flex>
+
+      {/* Mobile Drawer */}
+      <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Menu</DrawerHeader>
+          <DrawerBody>
+            <VStack align="start" spacing={4}>
+              {menuItems.map((item) => (
+                <Box key={item.title} w="100%">
+                  <MenuItem
+                    title={item.title}
+                    href={item.href}
+                    hasDropdown={item.hasDropdown}
+                  />
+                  {item.title === "Resources" && (
+                    <VStack align="start" pl={4} spacing={2} mt={2}>
+                      {submenuItems.map((submenu) => (
+                        <Link
+                          key={submenu.title}
+                          href={submenu.href}
+                          display="flex"
+                          alignItems="center"
+                          px="2"
+                          py="1"
+                          _hover={{ bg: "gray.100", borderRadius: "md" }}
+                        >
+                          <Icon as={submenu.icon} mr={2} />
+                          {submenu.title}
+                        </Link>
+                      ))}
+                    </VStack>
+                  )}
+                </Box>
+              ))}
+
+              {/* Mobile Buttons */}
+              <Link
+                href="/auth/login"
+                fontSize="md"
+                fontWeight="medium"
+                color="gray.600"
+              >
+                Log in
+              </Link>
+              <Button
+                colorScheme="red"
+                w="full"
+                onClick={() => {
+                  onClose();
+                  navigate("/auth/signup");
+                }}
+              >
+                Start for free
+              </Button>
+            </VStack>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
     </Box>
   );
 }

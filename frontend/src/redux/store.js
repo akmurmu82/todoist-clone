@@ -31,7 +31,7 @@ const store = configureStore({
       serializableCheck: {
         ignoredActions: ["persist/PERSIST"], // This is important to avoid issues with non-serializable values in state
       },
-    }).concat(thunk),
+    }),
 });
 
 // Creating a persistor
