@@ -56,7 +56,6 @@ MenuItem.propTypes = {
 
 function Navbar() {
   const navigate = useNavigate();
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
