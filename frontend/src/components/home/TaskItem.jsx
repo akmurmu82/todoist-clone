@@ -32,7 +32,6 @@ import {
 } from "react-icons/fa";
 import { RiSofaLine } from "react-icons/ri";
 import { RxValueNone } from "react-icons/rx";
-import { RxValueNone } from "react-icons/rx";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { deleteTodoAsync, updateTodoAsync } from "../../redux/slices/todoSlice";
