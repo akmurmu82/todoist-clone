@@ -10,15 +10,6 @@ import {
   Icon,
   VStack,
   IconButton,
-<<<<<<< HEAD
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerOverlay,
-  DrawerCloseButton,
-  useDisclosure,
-  Stack,
-=======
   useDisclosure,
   Drawer,
   DrawerOverlay,
@@ -26,7 +17,6 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   DrawerBody,
->>>>>>> 4fe5526 (- Made Navbar responsive)
 } from "@chakra-ui/react";
 import {
   FaChevronDown,
@@ -88,11 +78,7 @@ function Navbar() {
   ];
 
   return (
-<<<<<<< HEAD
-    <Box px={{ base: 4, md: 8 }} py={4} boxShadow="sm">
-=======
     <Box px={6} py={4} boxShadow="sm" position="sticky" top="0" bg="white" zIndex="1000">
->>>>>>> 4fe5526 (- Made Navbar responsive)
       <Flex alignItems="center">
         {/* Logo Section */}
         <Text fontSize="2xl" fontWeight="bold" color="red.500">
@@ -106,19 +92,11 @@ function Navbar() {
           as="nav"
           spacing={8}
           fontSize="md"
-<<<<<<< HEAD
-          pr={2}
-          borderRight={{ base: "none", md: "1px solid grey" }}
-          fontWeight="medium"
-          color="gray.700"
-          display={{ base: "none", lg: "flex" }}
-=======
           fontWeight="medium"
           color="gray.700"
           display={{ base: "none", md: "flex" }}
           pr={2}
           borderRight={"1px solid grey"}
->>>>>>> 4fe5526 (- Made Navbar responsive)
         >
           {menuItems.map((item) => (
             <Box
@@ -197,62 +175,6 @@ function Navbar() {
           </Button>
         </HStack>
 
-<<<<<<< HEAD
-        {/* Mobile Menu Button */}
-        <IconButton
-          display={{ base: "flex", md: "none" }}
-          onClick={onOpen}
-          variant="ghost"
-          icon={<FaBars />}
-          aria-label="Open Menu"
-        />
-
-        {/* Mobile Drawer */}
-        <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
-          <DrawerOverlay />
-          <DrawerContent>
-            <DrawerCloseButton />
-            <DrawerBody pt={16}>
-              <Stack spacing={4}>
-                {menuItems.map((item) => (
-                  <MenuItem
-                    key={item.title}
-                    title={item.title}
-                    href={item.href}
-                    hasDropdown={item.hasDropdown}
-                    onClick={onClose}
-                  />
-                ))}
-                <Box borderTop="1px solid" borderColor="gray.200" pt={4}>
-                  <Link
-                    href="/auth/login"
-                    fontSize="md"
-                    fontWeight="medium"
-                    color="gray.600"
-                    display="block"
-                    py={2}
-                    onClick={onClose}
-                  >
-                    Log in
-                  </Link>
-                  <Button
-                    colorScheme="red"
-                    size="md"
-                    width="full"
-                    mt={2}
-                    onClick={() => {
-                      navigate("/auth/signup");
-                      onClose();
-                    }}
-                  >
-                    Start for free
-                  </Button>
-                </Box>
-              </Stack>
-            </DrawerBody>
-          </DrawerContent>
-        </Drawer>
-=======
         {/* Mobile Hamburger */}
         <IconButton
           aria-label="Open menu"
@@ -261,7 +183,6 @@ function Navbar() {
           onClick={onOpen}
           variant="ghost"
         />
->>>>>>> 4fe5526 (- Made Navbar responsive)
       </Flex>
 
       {/* Mobile Drawer */}

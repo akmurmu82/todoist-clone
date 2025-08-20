@@ -25,11 +25,8 @@ import { FaGoogle, FaFacebook, FaApple } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUserAsync } from "../../redux/slices/userSlice";
-<<<<<<< HEAD
 import GoogleSignIn from "../auth/GoogleSignIn";
-=======
 import GoogleAuthButton from "./GoogleAuthButton";
->>>>>>> 4fe5526 (- Made Navbar responsive)
 
 function LoginPage() {
   const dispatch = useDispatch();
@@ -105,33 +102,6 @@ function LoginPage() {
               onError={handleGoogleError}
             />
 
-<<<<<<< HEAD
-            <Box position="relative">
-              <Button
-                variant="outline"
-                fontSize={"lg"}
-                w="full"
-                leftIcon={<FaFacebook />}
-                aria-label="Continue with Facebook"
-                isDisabled
-                opacity={0.6}
-                cursor="not-allowed"
-              >
-                Continue with Facebook
-              </Button>
-              <Badge
-                position="absolute"
-                top="-8px"
-                right="-8px"
-                colorScheme="orange"
-                fontSize="xs"
-                borderRadius="full"
-                px={2}
-              >
-                Coming Soon
-              </Badge>
-            </Box>
-=======
             <Button
               variant="outline"
               fontSize={"lg"}
@@ -142,7 +112,6 @@ function LoginPage() {
               Continue with Facebook
             </Button>
             <GoogleAuthButton />
->>>>>>> 4fe5526 (- Made Navbar responsive)
 
             <Box position="relative">
               <Button
