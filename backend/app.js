@@ -13,7 +13,7 @@ console.log("Client URL:", process.env.CLIENT_URL);
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173", // Updated default port for Vite
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     credentials: true, // allows cookies/auth headers
   })
 );

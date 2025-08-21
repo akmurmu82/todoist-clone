@@ -23,7 +23,7 @@ export const fetchTodosAsync = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
-      const res = await axios.get(`${BASE_URL}/todos`, {
+      const res = await axios.get(`${BASE_URL}/api/todos`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -42,7 +42,7 @@ export const createTodoAsync = createAsyncThunk(
   async (todoData, { rejectWithValue }) => {
     try {
       let res = await axios.post(
-        `${BASE_URL}/todos/add`,
+        `${BASE_URL}/api/todos/add`,
         todoData,
         {
           headers: {
@@ -68,7 +68,7 @@ export const updateTodoAsync = createAsyncThunk(
       const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
 
       const res = await axios.patch(
-        `${BASE_URL}/todos/update/${todoId}`,
+        `${BASE_URL}/api/todos/update/${todoId}`,
         updatedData,
         {
           headers: {
@@ -91,7 +91,7 @@ export const deleteTodoAsync = createAsyncThunk(
   async (_id, { rejectWithValue }) => {
     try {
       const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
-      await axios.delete(`${BASE_URL}/todos/delete/${_id}`, {
+      await axios.delete(`${BASE_URL}/api/todos/delete/${_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
