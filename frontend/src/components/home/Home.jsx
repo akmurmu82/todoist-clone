@@ -44,23 +44,30 @@ const Home = () => {
     switch (currentView) {
       case "Today":
         const today = new Date().toLocaleDateString();
-        return todos.filter(todo => {
+        const todayTodos = todos.filter(todo => {
           if (!todo.dueDate) return false;
           const todoDate = new Date(todo.dueDate.split('/').reverse().join('-')).toLocaleDateString();
-          return todoDate === today && !todo.isCompleted;
+          return todoDate === today;
         });
+        return todayTodos;
       case "Upcoming":
         const todayDate = new Date();
-        return todos.filter(todo => {
-          if (!todo.dueDate || todo.isCompleted) return false;
+        const upcomingTodos = todos.filter(todo => {
+          if (!todo.dueDate) return false;
           const todoDate = new Date(todo.dueDate.split('/').reverse().join('-'));
           return todoDate > todayDate;
         });
+        return upcomingTodos;
       case "Inbox":
       default:
-        return todos.filter(todo => !todo.isCompleted);
+        return todos;
     }
   };
+
+  // Separate completed and incomplete todos
+  const allFilteredTodos = getFilteredTodos();
+  const incompleteTodos = allFilteredTodos.filter(todo => !todo.isCompleted);
+  const completedTodos = allFilteredTodos.filter(todo => todo.isCompleted);
 
   const filteredTodos = getFilteredTodos();
   console.log("Filtered Todos:", filteredTodos);
@@ -82,15 +89,14 @@ const Home = () => {
         {isLoading && [...Array(3)].map((_, idx) => <TodoItemSkeleton key={idx} />)}
 
         {/* No todos */}
-        {!isLoading && filteredTodos.length === 0 && (
+        {!isLoading && allFilteredTodos.length === 0 && (
           <Text fontSize="md" color="gray.600" textAlign="center">
             No todos to show in {currentView}.
           </Text>
         )}
 
-
-        {/* Todos */}
-        {!isLoading && filteredTodos
+        {/* Incomplete Todos */}
+        {!isLoading && incompleteTodos
             .filter((todo) => todo && todo._id) // skip null or invalid todos
             .map((todo) => (
               <TaskItem
@@ -99,6 +105,27 @@ const Home = () => {
                 toggleOnModalOpen={toggleOnModalOpen}
               />
             ))}
+
+        {/* Completed Todos Section */}
+        {!isLoading && completedTodos.length > 0 && (
+          <>
+            <Box mt={8} mb={4}>
+              <Text fontSize="sm" color="gray.500" fontWeight="medium">
+                Completed ({completedTodos.length})
+              </Text>
+            </Box>
+            {completedTodos
+              .filter((todo) => todo && todo._id)
+              .map((todo) => (
+                <TaskItem
+                  key={todo._id}
+                  todo={todo}
+                  toggleOnModalOpen={toggleOnModalOpen}
+                  isCompleted={true}
+                />
+              ))}
+          </>
+        )}
 
         {/* Add Todo Button */}
         <HStack

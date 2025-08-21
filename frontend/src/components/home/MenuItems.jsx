@@ -46,8 +46,13 @@ const MenuItems = ({ toggleOnModalOpen, currentView, setCurrentView }) => {
     const today = new Date().toLocaleDateString();
     return todos.filter(todo => {
       if (!todo.dueDate) return false;
-      const todoDate = new Date(todo.dueDate.split('/').reverse().join('-')).toLocaleDateString();
-      return todoDate === today && !todo.isCompleted;
+      try {
+        const todoDate = new Date(todo.dueDate.split('/').reverse().join('-')).toLocaleDateString();
+        return todoDate === today && !todo.isCompleted;
+      } catch (error) {
+        console.error('Error parsing date:', todo.dueDate);
+        return false;
+      }
     }).length;
   };
 
@@ -58,11 +63,17 @@ const MenuItems = ({ toggleOnModalOpen, currentView, setCurrentView }) => {
 
   const getUpcomingCount = () => {
     if (!Array.isArray(todos)) return 0;
-    const today = new Date();
+    const today = new Date().toLocaleDateString();
     return todos.filter(todo => {
       if (!todo.dueDate || todo.isCompleted) return false;
-      const todoDate = new Date(todo.dueDate.split('/').reverse().join('-'));
-      return todoDate > today;
+      try {
+        const todoDate = new Date(todo.dueDate.split('/').reverse().join('-')).toLocaleDateString();
+        const todayDate = new Date().toLocaleDateString();
+        return new Date(todo.dueDate.split('/').reverse().join('-')) > new Date() && !todo.isCompleted;
+      } catch (error) {
+        console.error('Error parsing date:', todo.dueDate);
+        return false;
+      }
     }).length;
   };
 

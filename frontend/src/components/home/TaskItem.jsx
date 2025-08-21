@@ -40,19 +40,23 @@ import { isToday, isTomorrow, format, parse } from "date-fns";
 export default function TaskItem({
   todo,
   toggleOnModalOpen,
+  isCompleted = false,
 }) {
   const {
     title = "Sample Task",
     _id,
     description = "This is a sample task description",
     dueDate,
-    isCompleted = false,
+    isCompleted: todoCompleted = false,
     priority = "medium",
   } = todo;
   const dispatch = useDispatch();
   const toast = useToast();
   const [isHovering, setIsHovering] = useState(false);
-  const [checked, setChecked] = useState(isCompleted);
+  const [checked, setChecked] = useState(todoCompleted);
+  
+  // Use the prop to determine if this is in completed section
+  const showAsCompleted = isCompleted || todoCompleted;
 
   // Check if the due date is today or tomorrow
   const parsedDueDate = dueDate ? parse(dueDate, "dd/MM/yyyy", new Date()) : new Date();
@@ -130,6 +134,8 @@ export default function TaskItem({
       borderBottomWidth={1}
       borderRadius={"md"}
       px={2}
+      opacity={showAsCompleted ? 0.6 : 1}
+      textDecoration={showAsCompleted ? "line-through" : "none"}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -143,13 +149,28 @@ export default function TaskItem({
           onChange={() => handleUpdate(_id, { isCompleted: !checked })}
         />
         <VStack align="start" spacing={1} flex={1}>
-          <Text fontWeight="medium">{title}</Text>
-          <Text fontSize="sm" color="gray.600">
+          <Text 
+            fontWeight="medium"
+            color={showAsCompleted ? "gray.500" : "inherit"}
+          >
+            {title}
+          </Text>
+          <Text 
+            fontSize="sm" 
+            color={showAsCompleted ? "gray.400" : "gray.600"}
+          >
             {description}
           </Text>
           <HStack>
-            <Icon as={FaRegCalendar} color="orange.500" boxSize={3} />
-            <Text fontSize="xs" color="orange.500">
+            <Icon 
+              as={FaRegCalendar} 
+              color={showAsCompleted ? "gray.400" : "orange.500"} 
+              boxSize={3} 
+            />
+            <Text 
+              fontSize="xs" 
+              color={showAsCompleted ? "gray.400" : "orange.500"}
+            >
               {formattedDate}
             </Text>
           </HStack>
@@ -352,8 +373,9 @@ TaskItem.propTypes = {
   dueDate: PropTypes.string,
   description: PropTypes.string,
   priority: PropTypes.string,
-  isCompleted: PropTypes.bool,
+  todo: PropTypes.object,
   toggleOnModalOpen: PropTypes.func,
+  isCompleted: PropTypes.bool,
 };
 
 Option.propTypes = {
