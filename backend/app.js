@@ -5,14 +5,37 @@ const todoRouter = require("./routes/todoRoute");
 require("dotenv").config();
 
 const app = express();
-app.use(express.json());
-app.use(cors());
 
-app.use("/users", userRouter);
-app.use("/todos", todoRouter);
+app.use(express.json());
+console.log(process.env.CLIENT_URL)
+
+// ✅ CORS setup (configure allowed origins)
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:3000", // frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // allows cookies/auth headers
+  })
+);
+
+// ✅ Disable COOP/COEP so postMessage works with Google OAuth
+app.use((req, res, next) => {
+  res.removeHeader("Cross-Origin-Opener-Policy");
+  res.removeHeader("Cross-Origin-Embedder-Policy");
+  next();
+});
+
+app.use("/api/auth", userRouter);
+app.use("/api/todos", todoRouter);
 
 app.get("/", (req, res) => {
-    res.json({ message: "Welcome to the Todoist-clone Server" });
+  res.json({ message: "Welcome to the Todoist-clone Server" });
+});
+
+// ✅ Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Something went wrong!" });
 });
 
 module.exports = app;

@@ -1,18 +1,15 @@
 require("dotenv").config();
 const app = require("./app");
 const connectDB = require("./config/db");
-const cors = require("cors");
+const morgan = require("morgan");
 
 const port = process.env.PORT || 8080;
 
-// ✅ CORS setup (configure allowed origins)
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000", // frontend URL
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // allows cookies/auth headers
-  })
-);
+console.log(process.env.NODE_ENV)
+// ✅ Logger middleware (works in dev only)
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 
 // ✅ MongoDB connection
 if (!process.env.MONGO_URI) {

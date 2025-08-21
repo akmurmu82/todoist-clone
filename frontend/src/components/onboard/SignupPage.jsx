@@ -25,7 +25,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../../redux/slices/userSlice";
-import GoogleSignIn from "../auth/GoogleSignIn";
+import GoogleAuthButton from "../login/GoogleAuthButton";
 const BaseBackendURL = import.meta.env.VITE_BASE_BACKEND_URL;
 
 function SignupPage() {
@@ -49,7 +49,7 @@ function SignupPage() {
     setIsLoading(true);
     try {
       // if(email)
-      let res = await axios.post(`${BaseBackendURL}/users/register`, {
+      let res = await axios.post(`${BaseBackendURL}/auth/register`, {
         email,
         password,
       });
@@ -122,12 +122,6 @@ function SignupPage() {
           {/* Buttons and Form */}
           <Stack direction="column" spacing={4} w="full">
             {/* Social Logins */}
-            <GoogleSignIn 
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              buttonText="Sign up with Google"
-            />
-
             <Box position="relative">
               <Button
                 variant="outline"
@@ -179,6 +173,8 @@ function SignupPage() {
                 Coming Soon
               </Badge>
             </Box>
+
+            <GoogleAuthButton />
 
             {/* Email Input */}
             <FormControl

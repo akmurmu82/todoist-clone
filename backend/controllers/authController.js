@@ -37,11 +37,13 @@ const loginUser = async (req, res) => {
 const googleLogin = async (req, res) => {
     try {
         const { token } = req.body;
+        console.log("token:", token)
 
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: process.env.GOOGLE_CLIENT_ID,
         });
+        console.log("Ticket:", ticket)
 
         const payload = ticket.getPayload(); // { email, name, picture, sub }
 
@@ -57,7 +59,8 @@ const googleLogin = async (req, res) => {
 
         const appToken = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: "7d" });
 
-        res.json({ token: appToken, user: { id: user._id, name: user.name, email: user.email, picture: user.picture } });
+        // res.json({ token: appToken, user: { id: user._id, name: user.name, email: user.email, picture: user.picture } });
+        res.redirect(`${CLIENT_URL}/home`);
     } catch (error) {
         res.status(500).json({ status: false, message: error.message });
     }

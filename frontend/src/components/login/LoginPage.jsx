@@ -25,7 +25,6 @@ import { FaGoogle, FaFacebook, FaApple } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUserAsync } from "../../redux/slices/userSlice";
-import GoogleSignIn from "../auth/GoogleSignIn";
 import GoogleAuthButton from "./GoogleAuthButton";
 
 function LoginPage() {
@@ -60,16 +59,6 @@ function LoginPage() {
       });
   };
 
-  const handleGoogleSuccess = (response) => {
-    console.log("Google Sign-In Success:", response);
-    // TODO: Send Google token to backend for verification
-    // For now, just navigate to home
-    navigate("/home");
-  };
-
-  const handleGoogleError = (error) => {
-    console.error("Google Sign-In Error:", error);
-  };
   return (
     <Box
       px={{ base: "10px", md: "40px", lg: "200px" }}
@@ -97,21 +86,29 @@ function LoginPage() {
           </Text>
 
           <Stack direction="column" spacing={4} w="full">
-            <GoogleSignIn 
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-            />
-
-            <Button
-              variant="outline"
-              fontSize={"lg"}
-              w="full"
-              aria-label="Continue with Facebook"
-              _hover={{ bg: "gray.100" }}
-            >
-              Continue with Facebook
-            </Button>
-            <GoogleAuthButton />
+            <Box position="relative">
+              <Button
+                variant="outline"
+                fontSize={"lg"}
+                w="full"
+                aria-label="Continue with Facebook"
+                leftIcon={<FaFacebook />}
+                _hover={{ bg: "gray.100" }}
+              >
+                Continue with Facebook
+              </Button>
+              <Badge
+                position="absolute"
+                top="-8px"
+                right="-8px"
+                colorScheme="orange"
+                fontSize="xs"
+                borderRadius="full"
+                px={2}
+              >
+                Coming Soon
+              </Badge>
+            </Box>
 
             <Box position="relative">
               <Button
@@ -138,6 +135,8 @@ function LoginPage() {
                 Coming Soon
               </Badge>
             </Box>
+
+            <GoogleAuthButton />
 
             <FormControl isInvalid={isEmailInvalid}>
               <FormLabel htmlFor="email" mb={1} fontSize="sm">
