@@ -7,12 +7,12 @@ require("dotenv").config();
 const app = express();
 
 app.use(express.json());
-console.log(process.env.CLIENT_URL)
+console.log("Client URL:", process.env.CLIENT_URL);
 
 // ✅ CORS setup (configure allowed origins)
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000", // frontend URL
+    origin: process.env.CLIENT_URL || "http://localhost:5173", // Updated default port for Vite
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // allows cookies/auth headers
   })

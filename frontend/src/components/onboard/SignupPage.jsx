@@ -178,7 +178,7 @@ function SignupPage() {
 
             {/* Email Input */}
             <FormControl
-              isInvalid={!email}
+              isInvalid={email === ""}
               p={2}
               borderRadius={"md"}
               border={"1px solid #f1f1f1"}
@@ -202,7 +202,7 @@ function SignupPage() {
 
             {/* Password Input */}
             <FormControl
-              isInvalid={!password}
+              isInvalid={password === ""}
               p={2}
               borderRadius={"md"}
               border={"1px solid #f1f1f1"}

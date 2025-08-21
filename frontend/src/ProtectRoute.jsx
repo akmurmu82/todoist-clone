@@ -1,14 +1,19 @@
 import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 
-// Example authentication function, replace it with your actual auth logic
 const isAuthenticated = () => {
-  // This should check if the user is authenticated (e.g., by checking a token in localStorage or Redux store)
-  return !!localStorage.getItem("todoistAuthToken"); // Example check
+  const token = localStorage.getItem("todoistAuthToken");
+  return !!token && token !== "undefined" && token !== "null";
 };
 
 const PrivateRoute = ({ element }) => {
-  return isAuthenticated() ? element : <Navigate to="/auth/login" />;
+  const { isAuthenticated: reduxAuth } = useSelector((state) => state.user);
+  
+  // Check both localStorage token and Redux state
+  const authenticated = isAuthenticated() || reduxAuth;
+  
+  return authenticated ? element : <Navigate to="/auth/login" />;
 };
 
 PrivateRoute.propTypes = {

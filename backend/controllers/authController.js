@@ -37,31 +37,43 @@ const loginUser = async (req, res) => {
 const googleLogin = async (req, res) => {
     try {
         const { token } = req.body;
-        console.log("token:", token)
+        console.log("Google token received:", token);
 
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: process.env.GOOGLE_CLIENT_ID,
         });
-        console.log("Ticket:", ticket)
 
-        const payload = ticket.getPayload(); // { email, name, picture, sub }
+        const payload = ticket.getPayload();
+        console.log("Google payload:", payload);
 
         let user = await UserModel.findOne({ email: payload.email });
         if (!user) {
+            // Create new user for Google sign-in
             user = await UserModel.create({
                 email: payload.email,
                 name: payload.name,
                 picture: payload.picture,
-                password: null, // make optional in schema for social login
+                profilePic: payload.picture,
+                password: null, // No password for Google users
             });
         }
 
         const appToken = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: "7d" });
 
-        // res.json({ token: appToken, user: { id: user._id, name: user.name, email: user.email, picture: user.picture } });
-        res.redirect(`${CLIENT_URL}/home`);
+        res.status(200).json({
+            status: true,
+            message: "Google login successful",
+            token: appToken,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                profilePic: user.profilePic || user.picture,
+            },
+        });
     } catch (error) {
+        console.error("Google login error:", error);
         res.status(500).json({ status: false, message: error.message });
     }
 };
