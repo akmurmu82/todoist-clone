@@ -92,6 +92,8 @@ function LoginPage() {
                 fontSize={"lg"}
                 w="full"
                 aria-label="Continue with Facebook"
+                isDisabled
+                opacity={0.6}
                 leftIcon={<FaFacebook />}
                 _hover={{ bg: "gray.100" }}
               >

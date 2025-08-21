@@ -8,6 +8,7 @@ const updateTodos = async (req, res) => {
     const { todoId } = req.params;
     const { title, description, dueDate, priority, isCompleted } = req.body;
     const updateData = {};
+    console.log("Updating Todo with ID:", todoId, "Data:", req.body);
 
     if (title) updateData.title = title;
     if (description) updateData.description = description;

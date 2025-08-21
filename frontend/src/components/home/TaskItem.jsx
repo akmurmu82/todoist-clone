@@ -65,18 +65,19 @@ export default function TaskItem({
       : format(parsedDueDate, "dd/MM/yyyy");
 
   // Handle update Todo: title, description, priority, isCompleted
-  const handleUpdate = async (updatedFields) => {
+  const handleUpdate = async (todoId, updatedFields) => {
     try {
       // Dispatch the thunk with _id and updated fields
-      const res = await dispatch(updateTodoAsync({ _id, ...updatedFields }));
-      console.log(updatedFields);
+      const res = await dispatch(updateTodoAsync({ todoId, updatedFields }));
+      // console.log(todoId, updatedFields);
+      // console.log("Update response:", res);
 
       if (res.type.endsWith("fulfilled")) {
         // Optionally update local state like checkbox
         if ("isCompleted" in updatedFields) {
           setChecked(updatedFields.isCompleted);
         }
-        console.log(res)
+        // console.log(res)
         toast({
           title: "Todo updated.",
           status: "success",
@@ -84,7 +85,7 @@ export default function TaskItem({
           isClosable: true,
         });
       } else {
-        throw new Error("Update failed");
+        throw new Error(res.payload || "Failed to update todo");
       }
     } catch (err) {
       console.error("Error updating todo:", err);
@@ -93,6 +94,7 @@ export default function TaskItem({
         status: "error",
         duration: 2000,
         isClosable: true,
+        description: err.message || "Something went wrong",
       });
     }
   };
@@ -123,7 +125,6 @@ export default function TaskItem({
     }
   };
 
-
   return (
     <Box
       borderBottomWidth={1}
@@ -139,7 +140,7 @@ export default function TaskItem({
           mr={3}
           mt={1}
           isChecked={checked}
-          onChange={() => handleUpdate({ isCompleted: !checked })}
+          onChange={() => handleUpdate(_id, { isCompleted: !checked })}
         />
         <VStack align="start" spacing={1} flex={1}>
           <Text fontWeight="medium">{title}</Text>

@@ -28,7 +28,7 @@ export const fetchTodosAsync = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(res.data.data);
+      console.log("Fetched Todos:", res.data.data);
       return res.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -63,13 +63,17 @@ export const createTodoAsync = createAsyncThunk(
 
 export const updateTodoAsync = createAsyncThunk(
   "todos/updateTodo",
-  async ({ todoId, updatedData }, { rejectWithValue }) => {
+  async ({ todoId, updatedFields }, { rejectWithValue }) => {
+    // console.log("Updating Todo with ID:", "Data:", updatedFields);
+    if (!updatedFields) {
+      return rejectWithValue("Todo ID and updated data are required");
+    }
     try {
       const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
 
       const res = await axios.patch(
         `${BASE_URL}/api/todos/update/${todoId}`,
-        updatedData,
+        updatedFields,
         {
           headers: {
             authorization: `Bearer ${token}`,
@@ -157,12 +161,12 @@ const todoSlice = createSlice({
 
       // Update Todo
       .addCase(updateTodoAsync.fulfilled, (state, action) => {
-  const { todoId, updatedTodo } = action.payload;
-  const index = state.todos.findIndex((todo) => todo._id === todoId);
-  if (index !== -1) {
-    state.todos[index] = updatedTodo;
-  }
-})
+        const { todoId, updatedTodo } = action.payload;
+        const index = state.todos.findIndex((todo) => todo._id === todoId);
+        if (index !== -1) {
+          state.todos[index] = updatedTodo;
+        }
+      })
 
       // Delete Todo
       .addCase(deleteTodoAsync.fulfilled, (state, action) => {

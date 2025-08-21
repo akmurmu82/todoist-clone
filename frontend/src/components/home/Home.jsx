@@ -63,6 +63,7 @@ const Home = () => {
   };
 
   const filteredTodos = getFilteredTodos();
+  console.log("Filtered Todos:", filteredTodos);
   return (
     <>
       <Sidebar
