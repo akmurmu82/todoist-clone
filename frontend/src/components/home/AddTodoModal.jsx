@@ -280,7 +280,10 @@ function AddTodoModal({ currTodoId, setCurrTodoId, isModalOpen, onModalClose }) 
               isDisabled={!title || !dueDate}
             >
               {isLoading ? (
-                <Spinner />
+                <HStack spacing={2}>
+                  <Spinner size="sm" />
+                  <Text>{currTodoId ? "Updating..." : "Creating..."}</Text>
+                </HStack>
               ) : currTodoId ? (
                 "Update task"
               ) : (

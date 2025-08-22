@@ -16,6 +16,15 @@ import {
   Divider,
   Tooltip,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Select,
+  Input,
 } from "@chakra-ui/react";
 import {
   FaRegCalendar,
@@ -29,6 +38,7 @@ import {
   FaCopy,
   FaLink,
   FaTrash,
+  FaCalendarAlt,
 } from "react-icons/fa";
 import { RiSofaLine } from "react-icons/ri";
 import { RxValueNone } from "react-icons/rx";
@@ -54,6 +64,9 @@ export default function TaskItem({
   const toast = useToast();
   const [isHovering, setIsHovering] = useState(false);
   const [checked, setChecked] = useState(todoCompleted);
+  const { isOpen: isMoveModalOpen, onOpen: onMoveModalOpen, onClose: onMoveModalClose } = useDisclosure();
+  const [selectedProject, setSelectedProject] = useState("Inbox");
+  const [isUpdating, setIsUpdating] = useState(false);
   
   // Use the prop to determine if this is in completed section
   const showAsCompleted = isCompleted || todoCompleted;
@@ -70,6 +83,7 @@ export default function TaskItem({
 
   // Handle update Todo: title, description, priority, isCompleted
   const handleUpdate = async (todoId, updatedFields) => {
+    setIsUpdating(true);
     try {
       // Dispatch the thunk with _id and updated fields
       const res = await dispatch(updateTodoAsync({ todoId, updatedFields }));
@@ -101,6 +115,7 @@ export default function TaskItem({
         description: err.message || "Something went wrong",
       });
     }
+      setIsUpdating(false);
   };
 
   // Delete Todo
@@ -129,7 +144,59 @@ export default function TaskItem({
     }
   };
 
+  // Handle due date updates
+  const handleDueDateUpdate = (newDate) => {
+    const formattedDate = newDate.toLocaleDateString();
+    handleUpdate(_id, { dueDate: formattedDate });
+  };
+
+  // Handle priority updates
+  const handlePriorityUpdate = (newPriority) => {
+    handleUpdate(_id, { priority: newPriority });
+  };
+
+  // Handle duplicate todo
+  const handleDuplicate = () => {
+    const duplicatedTodo = {
+      title: `${title} (Copy)`,
+      description,
+      priority,
+      dueDate,
+    };
+    // You would need to implement createTodoAsync in your redux slice
+    toast({
+      title: "Todo duplicated",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
+  };
+
+  // Handle copy link
+  const handleCopyLink = () => {
+    const link = `${window.location.origin}/todo/${_id}`;
+    navigator.clipboard.writeText(link);
+    toast({
+      title: "Link copied to clipboard",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
+  };
+
+  // Handle move to project
+  const handleMoveToProject = () => {
+    // Implement project moving logic here
+    toast({
+      title: `Todo moved to ${selectedProject}`,
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
+    onMoveModalClose();
+  };
   return (
+    <>
     <Box
       borderBottomWidth={1}
       borderRadius={"md"}
@@ -146,6 +213,7 @@ export default function TaskItem({
           mr={3}
           mt={1}
           isChecked={checked}
+          isDisabled={isUpdating}
           onChange={() => handleUpdate(_id, { isCompleted: !checked })}
         />
         <VStack align="start" spacing={1} flex={1}>
@@ -240,6 +308,7 @@ export default function TaskItem({
                         icon={FaPencilAlt}
                         text="Edit"
                         shortcut="Ctrl E"
+                        handleClick={() => toggleOnModalOpen(_id)}
                       />
 
                       <VStack align="stretch" p={2} spacing={1}>
@@ -253,6 +322,11 @@ export default function TaskItem({
                               variant="ghost"
                               icon={<Icon as={FaSun} />}
                               flex={1}
+                              onClick={() => {
+                                const tomorrow = new Date();
+                                tomorrow.setDate(tomorrow.getDate() + 1);
+                                handleDueDateUpdate(tomorrow);
+                              }}
                             />
                           </Tooltip>
                           <Tooltip label="Weekend" placement="top">
@@ -261,6 +335,12 @@ export default function TaskItem({
                               variant="ghost"
                               icon={<Icon as={RiSofaLine} />}
                               flex={1}
+                              onClick={() => {
+                                const weekend = new Date();
+                                const daysUntilSaturday = (6 - weekend.getDay()) % 7;
+                                weekend.setDate(weekend.getDate() + daysUntilSaturday);
+                                handleDueDateUpdate(weekend);
+                              }}
                             />
                           </Tooltip>
                           <Tooltip label="Next week" placement="top">
@@ -269,6 +349,11 @@ export default function TaskItem({
                               variant="ghost"
                               icon={<Icon as={FaRedo} />}
                               flex={1}
+                              onClick={() => {
+                                const nextWeek = new Date();
+                                nextWeek.setDate(nextWeek.getDate() + 7);
+                                handleDueDateUpdate(nextWeek);
+                              }}
                             />
                           </Tooltip>
                           <Tooltip label="No date" placement="top">
@@ -276,6 +361,7 @@ export default function TaskItem({
                               size="sm"
                               variant="ghost"
                               icon={<Icon as={RxValueNone} />}
+                              onClick={() => handleUpdate(_id, { dueDate: null })}
                             />
                           </Tooltip>
                         </HStack>
@@ -290,21 +376,25 @@ export default function TaskItem({
                             size="sm"
                             variant="ghost"
                             leftIcon={<Icon as={FaFlag} color="red.500" />}
+                            onClick={() => handlePriorityUpdate("high")}
                           />
                           <Button
                             size="sm"
                             variant="ghost"
                             leftIcon={<Icon as={FaFlag} color="orange.500" />}
+                            onClick={() => handlePriorityUpdate("medium")}
                           />
                           <Button
                             size="sm"
                             variant="ghost"
                             leftIcon={<Icon as={FaFlag} color="blue.500" />}
+                            onClick={() => handlePriorityUpdate("low")}
                           />
                           <Button
                             size="sm"
                             variant="ghost"
                             leftIcon={<Icon as={FaFlag} color="gray.500" />}
+                            onClick={() => handlePriorityUpdate("none")}
                           />
                         </HStack>
                       </VStack>
@@ -313,12 +403,14 @@ export default function TaskItem({
                         icon={FaArrowRight}
                         text="Move to..."
                         shortcut="M"
+                        handleClick={onMoveModalOpen}
                       />
                       <Option icon={FaCopy} text="Duplicate" />
                       <Option
                         icon={FaLink}
                         text="Copy link to task"
                         shortcut="Ctrl C"
+                        handleClick={handleDuplicate}
                       />
                       <Option
                         icon={FaTrash}
@@ -326,6 +418,7 @@ export default function TaskItem({
                         isDelete={true}
                         shortcut="Ctrl D"
                         handleClick={handleDeleteTodo}
+                        handleClick={handleCopyLink}
                       />
                     </VStack>
                   </Box>
@@ -336,6 +429,40 @@ export default function TaskItem({
         )}
       </Flex>
     </Box>
+
+    {/* Move to Project Modal */}
+    <Modal isOpen={isMoveModalOpen} onClose={onMoveModalClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Move to Project</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody pb={6}>
+          <VStack spacing={4} align="stretch">
+            <Text fontSize="sm" color="gray.600">
+              Select a project to move "{title}" to:
+            </Text>
+            <Select
+              value={selectedProject}
+              onChange={(e) => setSelectedProject(e.target.value)}
+            >
+              <option value="Inbox">📥 Inbox</option>
+              <option value="Home">🏡 Home</option>
+              <option value="Work">🎯 My work</option>
+              <option value="Personal">👤 Personal</option>
+            </Select>
+            <HStack spacing={3} justify="flex-end">
+              <Button variant="ghost" onClick={onMoveModalClose}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={handleMoveToProject}>
+                Move
+              </Button>
+            </HStack>
+          </VStack>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+    </>
   );
 }
 

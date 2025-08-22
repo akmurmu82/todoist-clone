@@ -69,8 +69,6 @@ const Home = () => {
   const incompleteTodos = allFilteredTodos.filter(todo => !todo.isCompleted);
   const completedTodos = allFilteredTodos.filter(todo => todo.isCompleted);
 
-  const filteredTodos = getFilteredTodos();
-  console.log("Filtered Todos:", filteredTodos);
   return (
     <>
       <Sidebar
@@ -103,6 +101,7 @@ const Home = () => {
                 key={todo._id}
                 todo={todo}
                 toggleOnModalOpen={toggleOnModalOpen}
+                isCompleted={false}
               />
             ))}
 

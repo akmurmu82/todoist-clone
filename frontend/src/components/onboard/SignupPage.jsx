@@ -16,6 +16,7 @@ import {
   useToast,
   Spinner,
   Badge,
+  HStack,
 } from "@chakra-ui/react";
 import PropTypes from "prop-types";
 import { useState } from "react";
@@ -244,8 +245,16 @@ function SignupPage() {
               _hover={{ bg: "#db4c3e" }}
               aria-label="Log in"
               onClick={handleSignup}
+              isDisabled={isLoading}
             >
-              {isLoading ? <Spinner /> : "Sign up with Email"}
+              {isLoading ? (
+                <HStack spacing={2}>
+                  <Spinner size="sm" />
+                  <Text>Creating account...</Text>
+                </HStack>
+              ) : (
+                "Sign up with Email"
+              )}
             </Button>
 
             {/* Terms and Privacy Notice */}

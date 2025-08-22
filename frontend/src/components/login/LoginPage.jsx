@@ -207,7 +207,14 @@ function LoginPage() {
               isDisabled={loading}
               onClick={handleLogin}
             >
-              {loading ? <Spinner size="sm" /> : "Log in"}
+              {loading ? (
+                <HStack spacing={2}>
+                  <Spinner size="sm" />
+                  <Text>Logging in...</Text>
+                </HStack>
+              ) : (
+                "Log in"
+              )}
             </Button>
 
             <ChakraLink

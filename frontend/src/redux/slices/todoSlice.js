@@ -41,6 +41,7 @@ export const createTodoAsync = createAsyncThunk(
   "todos/createTodo",
   async (todoData, { rejectWithValue }) => {
     try {
+      const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
       let res = await axios.post(
         `${BASE_URL}/api/todos/add`,
         todoData,
@@ -108,6 +109,28 @@ export const deleteTodoAsync = createAsyncThunk(
   }
 );
 
+// 5. Duplicate Todo
+export const duplicateTodoAsync = createAsyncThunk(
+  "todos/duplicateTodo",
+  async (todoData, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("todoistAuthToken")) || "";
+      const res = await axios.post(
+        `${BASE_URL}/api/todos/add`,
+        { ...todoData, title: `${todoData.title} (Copy)` },
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return res.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 // ----------------------
 // SLICE
 // ----------------------
@@ -159,6 +182,13 @@ const todoSlice = createSlice({
         state.todos.push(action.payload);
       })
 
+      // Duplicate Todo
+      .addCase(duplicateTodoAsync.fulfilled, (state, action) => {
+        if (!Array.isArray(state.todos)) {
+          state.todos = [];
+        }
+        state.todos.push(action.payload);
+      })
       // Update Todo
       .addCase(updateTodoAsync.fulfilled, (state, action) => {
         const { todoId, updatedTodo } = action.payload;

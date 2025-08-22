@@ -18,6 +18,7 @@ import {
   Button,
   Flex,
   Icon,
+  Spinner,
 } from "@chakra-ui/react";
 import PropTypes from "prop-types";
 import { useState } from "react";
@@ -35,11 +36,34 @@ import { useSelector } from "react-redux";
 
 const MenuItems = ({ toggleOnModalOpen, currentView, setCurrentView }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const { isOpen: isSearchOpen, onOpen: onSearchOpen, onClose: onSearchClose } = useDisclosure();
   const { isOpen: isFiltersOpen, onOpen: onFiltersOpen, onClose: onFiltersClose } = useDisclosure();
   
   const { todos } = useSelector((state) => state.todos);
 
+  // Handle search functionality
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    // Simulate search delay
+    setTimeout(() => {
+      if (Array.isArray(todos)) {
+        const results = todos.filter(todo =>
+          todo.title?.toLowerCase().includes(query.toLowerCase()) ||
+          todo.description?.toLowerCase().includes(query.toLowerCase())
+        );
+        setSearchResults(results);
+      }
+      setIsSearching(false);
+    }, 300);
+  };
   // Calculate dynamic counts
   const getTodayCount = () => {
     if (!Array.isArray(todos)) return 0;
@@ -215,19 +239,58 @@ const MenuItems = ({ toggleOnModalOpen, currentView, setCurrentView }) => {
               <Input
                 placeholder="Search for tasks, projects, labels..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
               />
             </InputGroup>
             
-            {searchQuery && (
+            {isSearching && (
+              <Flex justify="center" mt={4}>
+                <Spinner size="sm" />
+                <Text ml={2} fontSize="sm" color="gray.500">
+                  Searching...
+                </Text>
+              </Flex>
+            )}
+
+            {searchQuery && !isSearching && (
               <Box mt={4}>
                 <Text fontSize="sm" color="gray.500" mb={2}>
-                  Search results for "{searchQuery}"
+                  {searchResults.length} result(s) for "{searchQuery}"
                 </Text>
-                {/* TODO: Implement actual search results */}
-                <Text fontSize="sm" color="gray.400">
-                  No results found. Try a different search term.
-                </Text>
+                {searchResults.length > 0 ? (
+                  <VStack spacing={2} align="stretch">
+                    {searchResults.map((todo) => (
+                      <Box
+                        key={todo._id}
+                        p={3}
+                        border="1px solid"
+                        borderColor="gray.200"
+                        borderRadius="md"
+                        _hover={{ bg: "gray.50", cursor: "pointer" }}
+                        onClick={() => {
+                          toggleOnModalOpen(todo._id);
+                          onSearchClose();
+                        }}
+                      >
+                        <Text fontWeight="medium" fontSize="sm">
+                          {todo.title}
+                        </Text>
+                        <Text fontSize="xs" color="gray.600" noOfLines={2}>
+                          {todo.description}
+                        </Text>
+                        {todo.dueDate && (
+                          <Text fontSize="xs" color="orange.500" mt={1}>
+                            Due: {todo.dueDate}
+                          </Text>
+                        )}
+                      </Box>
+                    ))}
+                  </VStack>
+                ) : (
+                  <Text fontSize="sm" color="gray.400">
+                    No results found. Try a different search term.
+                  </Text>
+                )}
               </Box>
             )}
           </ModalBody>

@@ -110,8 +110,16 @@ const UseCase = () => {
               size="lg"
               width="full"
               onClick={handleUpdateProfile}
+              isDisabled={isLoading}
             >
-              Launch Todoist
+              {isLoading ? (
+                <HStack spacing={2}>
+                  <Spinner size="sm" />
+                  <Text>Launching Todoist...</Text>
+                </HStack>
+              ) : (
+                "Launch Todoist"
+              )}
             </Button>
           </VStack>
         </Box>

@@ -193,7 +193,19 @@ function CreateProfile() {
               aria-label="Log in"
               onClick={handleUpdateProfile}
             >
-              {imageUploading ? "Uploading..." : "Continue"}
+              {isLoading ? (
+                <HStack spacing={2}>
+                  <Spinner size="sm" />
+                  <Text>Updating profile...</Text>
+                </HStack>
+              ) : imageUploading ? (
+                <HStack spacing={2}>
+                  <Spinner size="sm" />
+                  <Text>Uploading image...</Text>
+                </HStack>
+              ) : (
+                "Continue"
+              )}
             </Button>
 
           </Stack>
