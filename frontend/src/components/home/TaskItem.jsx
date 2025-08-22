@@ -63,13 +63,18 @@ export default function TaskItem({
   const dispatch = useDispatch();
   const toast = useToast();
   const [isHovering, setIsHovering] = useState(false);
-  const [checked, setChecked] = useState(todoCompleted);
+  const [checked, setChecked] = useState(isCompleted || todoCompleted);
   const { isOpen: isMoveModalOpen, onOpen: onMoveModalOpen, onClose: onMoveModalClose } = useDisclosure();
   const [selectedProject, setSelectedProject] = useState("Inbox");
   const [isUpdating, setIsUpdating] = useState(false);
   
-  // Use the prop to determine if this is in completed section
-  const showAsCompleted = isCompleted || todoCompleted;
+  // Update local state when props change
+  useEffect(() => {
+    setChecked(isCompleted || todoCompleted);
+  }, [isCompleted, todoCompleted]);
+
+  // Use the checkbox state to determine if this should show as completed
+  const showAsCompleted = checked;
 
   // Check if the due date is today or tomorrow
   const parsedDueDate = dueDate ? parse(dueDate, "dd/MM/yyyy", new Date()) : new Date();
@@ -114,6 +119,8 @@ export default function TaskItem({
         isClosable: true,
         description: err.message || "Something went wrong",
       });
+      // Revert checkbox state on error
+      setChecked(!checked);
     }
       setIsUpdating(false);
   };
@@ -214,7 +221,11 @@ export default function TaskItem({
           mt={1}
           isChecked={checked}
           isDisabled={isUpdating}
-          onChange={() => handleUpdate(_id, { isCompleted: !checked })}
+          onChange={(e) => {
+            const newCheckedState = e.target.checked;
+            setChecked(newCheckedState); // Update UI immediately
+            handleUpdate(_id, { isCompleted: newCheckedState });
+          }}
         />
         <VStack align="start" spacing={1} flex={1}>
           <Text 

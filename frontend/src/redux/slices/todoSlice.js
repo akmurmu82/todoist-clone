@@ -194,7 +194,8 @@ const todoSlice = createSlice({
         const { todoId, updatedTodo } = action.payload;
         const index = state.todos.findIndex((todo) => todo._id === todoId);
         if (index !== -1) {
-          state.todos[index] = updatedTodo;
+          // Ensure we maintain the array reference but update the todo
+          state.todos[index] = { ...state.todos[index], ...updatedTodo };
         }
       })
 

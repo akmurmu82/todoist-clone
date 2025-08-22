@@ -66,8 +66,15 @@ const Home = () => {
 
   // Separate completed and incomplete todos
   const allFilteredTodos = getFilteredTodos();
-  const incompleteTodos = allFilteredTodos.filter(todo => !todo.isCompleted);
-  const completedTodos = allFilteredTodos.filter(todo => todo.isCompleted);
+  
+  // Use a more robust filtering approach
+  const incompleteTodos = allFilteredTodos.filter(todo => {
+    return todo && typeof todo.isCompleted !== 'undefined' ? !todo.isCompleted : true;
+  });
+  
+  const completedTodos = allFilteredTodos.filter(todo => {
+    return todo && todo.isCompleted === true;
+  });
 
   return (
     <>
