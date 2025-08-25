@@ -126,7 +126,7 @@ function AddTodoModal({ currTodoId, setCurrTodoId, isModalOpen, onModalClose }) 
 
     try {
       if (currTodoId) {
-        console.log("Updating todo with ID:", currTodoId, "Payload:", payload);
+        // console.log("Updating todo with ID:", currTodoId, "Payload:", payload);
         await dispatch(updateTodoAsync({ todoId: currTodoId, updatedFields: payload })).unwrap();
       } else {
         await dispatch(createTodoAsync(payload)).unwrap();

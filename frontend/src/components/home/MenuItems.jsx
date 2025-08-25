@@ -1,10 +1,10 @@
-import { 
-  Box, 
-  Divider, 
-  HStack, 
-  Spacer, 
-  Text, 
-  VStack, 
+import {
+  Box,
+  Divider,
+  HStack,
+  Spacer,
+  Text,
+  VStack,
   Input,
   InputGroup,
   InputLeftElement,
@@ -40,7 +40,7 @@ const MenuItems = ({ toggleOnModalOpen, currentView, setCurrentView }) => {
   const [isSearching, setIsSearching] = useState(false);
   const { isOpen: isSearchOpen, onOpen: onSearchOpen, onClose: onSearchClose } = useDisclosure();
   const { isOpen: isFiltersOpen, onOpen: onFiltersOpen, onClose: onFiltersClose } = useDisclosure();
-  
+
   const { todos } = useSelector((state) => state.todos);
 
   // Handle search functionality
@@ -154,7 +154,7 @@ const MenuItems = ({ toggleOnModalOpen, currentView, setCurrentView }) => {
           borderRadius="md"
           px={4}
           _hover={{ bg: "gray.100", cursor: "pointer" }}
-          onClick={handleSearch}
+          onClick={() => { onSearchOpen(); setSearchQuery(""); setSearchResults([]); }}
         >
           <FaSearch />
           <Text>Search</Text>
@@ -242,7 +242,7 @@ const MenuItems = ({ toggleOnModalOpen, currentView, setCurrentView }) => {
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </InputGroup>
-            
+
             {isSearching && (
               <Flex justify="center" mt={4}>
                 <Spinner size="sm" />
@@ -325,9 +325,9 @@ const MenuItems = ({ toggleOnModalOpen, currentView, setCurrentView }) => {
                   </Button>
                 </VStack>
               </Box>
-              
+
               <Divider />
-              
+
               <Box>
                 <Flex justify="space-between" align="center" mb={2}>
                   <Text fontWeight="bold">Labels</Text>
