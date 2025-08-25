@@ -5,7 +5,6 @@ const morgan = require("morgan");
 
 const port = process.env.PORT || 8080;
 
-console.log(process.env.NODE_ENV)
 // ✅ Logger middleware (works in dev only)
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
