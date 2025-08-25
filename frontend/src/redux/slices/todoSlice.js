@@ -65,7 +65,7 @@ export const createTodoAsync = createAsyncThunk(
 export const updateTodoAsync = createAsyncThunk(
   "todos/updateTodo",
   async ({ todoId, updatedFields }, { rejectWithValue }) => {
-    // console.log("Updating Todo with ID:", "Data:", updatedFields);
+    // console.log("Updating Todo with ID:", todoId, "Data:", updatedFields);
     if (!updatedFields) {
       return rejectWithValue("Todo ID and updated data are required");
     }
