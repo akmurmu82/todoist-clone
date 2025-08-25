@@ -113,9 +113,9 @@ const MenuItems = ({ toggleOnModalOpen, currentView, setCurrentView }) => {
     { name: "My work 🎯", count: 6 },
   ];
 
-  const handleSearch = () => {
-    onSearchOpen();
-  };
+  // const handleSearch = () => {
+  //   onSearchOpen();
+  // };
 
   const handleFiltersAndLabels = () => {
     onFiltersOpen();

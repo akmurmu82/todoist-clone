@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   HStack,
@@ -429,7 +429,7 @@ export default function TaskItem({
                         isDelete={true}
                         shortcut="Ctrl D"
                         handleClick={handleDeleteTodo}
-                        handleClick={handleCopyLink}
+                        // handleClick={handleCopyLink}
                       />
                     </VStack>
                   </Box>
